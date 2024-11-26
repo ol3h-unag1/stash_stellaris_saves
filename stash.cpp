@@ -1,7 +1,10 @@
 #include <iostream>
+#include <vector>
 #include <string>
 #include <format>
 #include <filesystem>
+#include <algorithm>
+#include <ranges>
 #include <cstdlib>
 #include <pwd.h>
 #include <unistd.h>
@@ -9,6 +12,68 @@
 #include <exception>
 
 namespace fs = std::filesystem;
+
+// Function: check_and_create_dir
+// Purpose: Ensures the existence of a directory at the specified path.
+// Parameters:
+//   - path: const std::string& - The path of the directory to check or create.
+// Returns: 
+//   - bool - true if the directory exists or was successfully created, false otherwise.
+// Notes: Uses std::filesystem to handle path validation and directory operations. 
+bool check_and_create_dir(const std::string& path) {
+    try {
+        // If the directory exists or is created successfully, return true
+        if (fs::exists(path) || fs::create_directories(path)) {
+            return true;
+        }
+    } catch (...) {
+        // Return false if any exception occurs during the process
+    }
+    return false; // Return false if the directory does not exist and cannot be created
+}
+
+/**
+ * @brief Returns the last directory name from the given path.
+ * E.g., for input "/home/username/test/last4" returns "last4"
+ *
+ * If the path is empty or invalid, returns an empty string.
+ *
+ * @param path The input path to evaluate.
+ * @return std::string The last directory name, or an empty string if invalid.
+ */
+[[nodiscard]] constexpr std::string get_this_directory_name(const std::string& path) {
+    try {
+        fs::path p(path);
+        if (p.empty()) {
+            return "";
+        }
+        return p.filename().string();
+    } catch (...) {
+        return "";
+    }
+}
+
+/**
+ * @brief Returns the parent directory of the given path.
+ *
+ * If the path has no parent, it returns the passed parameter itself.
+ * If the path is invalid, it returns an empty string.
+ *
+ * @param dir The directory path to evaluate.
+ * @return std::string The parent directory path, the input if no parent, or an empty string if invalid.
+ */
+[[nodiscard]] constexpr std::string get_parent_directory(const std::string& dir) {
+    try {
+        fs::path path(dir);
+        if (!fs::exists(path) || !fs::is_directory(path)) {
+            return "";
+        }
+        auto parent = path.parent_path();
+        return parent.empty() ? dir : parent.string();
+    } catch (...) {
+        return "";
+    }
+}
 
 /**
  * @brief Retrieves a vector of filenames with the specified extension from a given directory.
@@ -50,9 +115,9 @@ std::vector<std::string> get_files_with_extension(const fs::path& directory, con
  *       a shell to run the command. Ensure that the command string is safe
  *       to avoid security risks (e.g., injection attacks).
  */
-int execute_terminal_command(const std::string& command) {
+bool execute_terminal_command(const std::string& command) {
     int result = std::system(command.c_str());
-    return (result == 0) ? 0 : -1; // Return 0 for success, -1 for failure
+    return (result == 0) ? true : false; // Return true for success, false for failure
 }
 
 [[nodiscard]] fs::path get_executable_directory() {
@@ -75,7 +140,7 @@ int execute_terminal_command(const std::string& command) {
     return "Unknown";
 }
 
-[[nodiscard]] std::string GetUserBackUpDirectory() {
+[[nodiscard]] auto GetUserBackUpDirectory() {
     const std::string username = get_current_username();
     if (username == "Unknown") {
         throw std::runtime_error("Unable to determine current user name");
@@ -89,7 +154,7 @@ int execute_terminal_command(const std::string& command) {
         }
     }
 
-    return backup_dir.string();
+    return backup_dir;
 }
 
 [[nodiscard]] std::size_t CountSaveFiles(const fs::path& directory) {
@@ -107,19 +172,45 @@ int execute_terminal_command(const std::string& command) {
     return count;
 }
 
+void StashSaves() {
+
+	auto const user_path = GetUserBackUpDirectory();
+    auto const exe_path = get_executable_directory();
+	auto const target_path = user_path / exe_path.filename();
+
+    if (not check_and_create_dir(target_path)) 
+    {
+        static std::string msg;
+        msg = std::format("stash_saves: can't create backup dir", target_path.string());
+        throw std::runtime_error(msg.data());
+
+        return; // o_O
+    }
+
+    auto saves = get_files_with_extension(exe_path, ".sav");
+    std::cout << std::format("I see {} save in '{}' directory", saves.size(), exe_path.string() ) << std::endl;
+
+    if (saves.empty())
+    {
+        static std::string msg;
+        msg = std::format("stash_saves: nothing to stash at {}", exe_path.string());
+        throw std::runtime_error(msg.data());   
+    }
+
+    std::ranges::for_each(saves, [](auto const& save){
+
+        std::cout << save << std::endl;
+    });
+
+    std::cout << target_path << std::endl;
+
+}
 
 int main() {
 
 try 
 {
-	auto user_path = GetUserBackUpDirectory();
-	auto const total_saves = CountSaveFiles(user_path);
-	auto const tostash_saves = CountSaveFiles(get_executable_directory());
-
-	std::cout << std::format(" + + + Stashing to: {}\n"
-		       	  	 " + + Saves before stashing: {}\n"
-				 " + + Saves to stash: {} \n"  
-			,user_path, total_saves, tostash_saves);
+    StashSaves(); // go!
 	
 	return 0;
 
