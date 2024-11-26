@@ -197,12 +197,25 @@ void StashSaves() {
         throw std::runtime_error(msg.data());   
     }
 
-    std::ranges::for_each(saves, [](auto const& save){
+    // Unary predicate to check if a string starts with "autosave"
+    auto starts_with_autosave = [](const std::string& s) {
 
-        std::cout << save << std::endl;
+        return s.starts_with("autosave");
+    };
+    auto partition_point = std::ranges::partition(saves, starts_with_autosave);
+
+    // View for "user saves" (not starting with "autosave")
+    auto user_saves = std::ranges::subrange(partition_point.begin(), saves.end());
+    auto auto_saves = std::ranges::subrange(saves.begin(), partition_point.begin());
+
+    std::ranges::for_each(saves, [&target_path](auto const& save){
+
+        std::string const command = std::format("mv {} {}", save, (target_path / save).string() );
+        //std::cout << command << std::endl;
+        execute_terminal_command(command);
     });
 
-    std::cout << target_path << std::endl;
+
 
 }
 
