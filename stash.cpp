@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <algorithm>
 #include <ranges>
+#include <chrono>
 #include <cstdlib>
 #include <pwd.h>
 #include <unistd.h>
@@ -12,6 +13,23 @@
 #include <exception>
 
 namespace fs = std::filesystem;
+
+fs::path add_timestamp_to_path(const fs::path& target_path) {
+
+    auto now = std::chrono::system_clock::now();
+    auto time_t_now = std::chrono::system_clock::to_time_t(now);
+    auto tm = *std::localtime(&time_t_now);
+
+    std::string timestamp = std::format("{:04}-{:02}-{:02}_{:02}-{:02}-{:02}",
+                                        tm.tm_year + 1900,
+                                        tm.tm_mon + 1,
+                                        tm.tm_mday,
+                                        tm.tm_hour,
+                                        tm.tm_min,
+                                        tm.tm_sec);
+
+    return target_path / timestamp;
+}
 
 // Function: check_and_create_dir
 // Purpose: Ensures the existence of a directory at the specified path.
@@ -177,11 +195,21 @@ void StashSaves() {
 	auto const user_path = GetUserBackUpDirectory();
     auto const exe_path = get_executable_directory();
 	auto const target_path = user_path / exe_path.filename();
+    auto const target_path_timestamp = add_timestamp_to_path(target_path);
 
     if (not check_and_create_dir(target_path)) 
     {
         static std::string msg;
         msg = std::format("stash_saves: can't create backup dir", target_path.string());
+        throw std::runtime_error(msg.data());
+
+        return; // o_O
+    }
+
+    if (not check_and_create_dir(target_path_timestamp)) 
+    {
+        static std::string msg;
+        msg = std::format("stash_saves: can't create backup dir with timestamp", target_path.string());
         throw std::runtime_error(msg.data());
 
         return; // o_O
@@ -206,15 +234,20 @@ void StashSaves() {
 
     // View for "user saves" (not starting with "autosave")
     auto user_saves = std::ranges::subrange(partition_point.begin(), saves.end());
-    auto auto_saves = std::ranges::subrange(saves.begin(), partition_point.begin());
+    std::ranges::for_each(user_saves, [&target_path_timestamp](auto const& save){
 
-    std::ranges::for_each(saves, [&target_path](auto const& save){
-
-        std::string const command = std::format("mv {} {}", save, (target_path / save).string() );
+        std::string const command = std::format("mv {} {}", save, (target_path_timestamp / save).string() );
         //std::cout << command << std::endl;
         execute_terminal_command(command);
     });
 
+    auto auto_saves = std::ranges::subrange(saves.begin(), partition_point.begin());
+    std::ranges::for_each(auto_saves, [&target_path_timestamp](auto const& save){
+
+        std::string const command = std::format("cp {} {}", save, (target_path_timestamp / save).string() );
+        //std::cout << command << std::endl;
+        execute_terminal_command(command);
+    });
 
 
 }
