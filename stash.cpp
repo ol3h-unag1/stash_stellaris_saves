@@ -10,6 +10,16 @@
 
 namespace fs = std::filesystem;
 
+[[nodiscard]] fs::path get_executable_directory() {
+    char exe_path[1024];
+    ssize_t len = readlink("/proc/self/exe", exe_path, sizeof(exe_path) - 1);
+    if (len == -1) {
+        throw std::runtime_error("Unable to determine executable path.");
+    }
+    exe_path[len] = '\0'; // Null-terminate the path
+    return fs::path(exe_path).parent_path();
+}
+
 [[nodiscard]] std::string get_current_username() {
     if (const char* username = getenv("USER"); username != nullptr) {
         return username;
@@ -37,7 +47,7 @@ namespace fs = std::filesystem;
     return backup_dir.string();
 }
 
-[[nodiscard]] std::size_t CountSavFiles(const fs::path& directory) {
+[[nodiscard]] std::size_t CountSaveFiles(const fs::path& directory) {
     if (!fs::exists(directory) || !fs::is_directory(directory)) {
         throw std::runtime_error("Invalid directory: " + directory.string());
     }
@@ -58,8 +68,13 @@ int main() {
 try 
 {
 	auto user_path = GetUserBackUpDirectory();
-	auto const total_saves = CountSavFiles(user_path);
-	std::cout << std::format(" + + + Stashing to: {}\n + + + Saves before stashing: {}\n", user_path, total_saves);
+	auto const total_saves = CountSaveFiles(user_path);
+	auto const tostash_saves = CountSaveFiles(get_executable_directory());
+
+	std::cout << std::format(" + + + Stashing to: {}\n"
+		       	  	 " + + Saves before stashing: {}\n"
+				 " + + Saves to stash: {} \n"  
+			,user_path, total_saves, tostash_saves);
 	return 0;
 
 }
