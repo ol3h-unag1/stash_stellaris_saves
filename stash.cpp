@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <tuple>
 #include <format>
 #include <filesystem>
 #include <algorithm>
@@ -313,6 +314,69 @@ void StashSaves() {
         execute_terminal_command(command);
     });
 
+
+}
+
+namespace WorkInProgress 
+{
+
+    using Int = int;
+
+    auto GeneratePaths() {
+
+        auto const user_path = GetUserBackUpDirectory();
+        auto const exe_path = get_executable_directory();
+        auto const target_path = user_path / exe_path.filename();
+        auto const target_path_timestamp = add_timestamp_to_path(target_path);
+
+        return std::make_tuple(user_path, exe_path, target_path, target_path_timestamp);
+    }
+
+    // Generalized function for creating directories with detailed exceptions
+        void ensure_directory(
+            const std::filesystem::path& path, 
+            const char* file, 
+            Int line){
+
+            if (not std::filesystem::exists(path)) 
+            {
+                if (not std::filesystem::create_directory(path)) 
+                {
+                    std::string msg = std::format("Failed to create directory '{}'. (File: {}, Line: {})", path.string(), file, line);
+                    throw std::runtime_error(msg);
+                }
+            }
+
+        }
+
+#define ENSURE_DIR(path) ensure_directory(path, __FILE__, __LINE__)
+
+// returns 0 - if ok 
+// returns 1 - if not ok
+// portion - [1, 50] how many saves stash a time;
+//           50 by deafault;
+//           out of range values defaults to 50;
+
+int StashSaves(int portion = 50) {
+
+    portion = std::clamp(portion, 1, 50);
+
+    auto [user_path, exe_path, target_path, target_path_timestamp] = GeneratePaths();
+
+    try 
+    {   
+        ENSURE_DIR(target_path);
+        ENSURE_DIR(target_path_timestamp);
+    } 
+    catch (const std::exception& e) 
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1; // Exit with error code
+    }
+
+
+    return 0;
+}
 
 }
 
