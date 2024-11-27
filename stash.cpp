@@ -281,9 +281,12 @@ void StashSaves() {
 
     // View for "user saves" (not starting with "autosave")
     auto sorted_user_saves_ref_vector = sorted_lt_ref_vector(std::ranges::subrange(partition_point.begin(), saves.end()));
-    auto sorted_user_saves_view = sorted_user_saves_ref_vector | std::ranges::views::transform([](const auto& ref) -> const std::string& {
-        return ref.get();
-    });
+    
+    auto sorted_user_saves_view = sorted_user_saves_ref_vector 
+    | std::ranges::views::transform([](const auto& ref) -> const std::string& {
+          return ref.get();
+      }) 
+    | std::ranges::views::take(sorted_user_saves_ref_vector.size() - 1); // Exclude last element so we can resume game
 
     std::cout << "Sorted view of " << sorted_user_saves_view.size() << std::endl;
     for (auto const& file : sorted_user_saves_view)
