@@ -4,7 +4,7 @@
 echo "Easing in...\n† ═╬═ 7 ═╬═ 7 ═╬═ †"
 
 # Compile the C++ program
-g++ -std=c++23 -o stash stash.cpp -O3
+g++ -std=c++23 -o stash_exe stash.cpp -O3
 
 # Create auto-save files
 for i in {1..5}; do
