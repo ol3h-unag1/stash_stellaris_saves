@@ -38,4 +38,10 @@ else
     echo "Error: Compiled program './stash' not found."
 fi
 
+echo "Stashed files:"
+ls
+
+echo "Folder added to:"
+ls ~/Stellaris/Saves/test_lab/
+
 echo "End of things...\n ⸸ ═╬═ 7 ═ ⸹⸹⸹ ╬ ⸹⸹⸹ ═ 7 ═╬═ ⸸"

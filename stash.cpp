@@ -14,6 +14,30 @@
 
 namespace fs = std::filesystem;
 
+
+// TODO:
+// Looking over all those functions I can't get aways from thoughts about pipes.
+// But. 
+// Main thing I think is how to check all required to werk korrecten things:
+// - directories 
+// - their parent directories
+// So we need to have constantly valid 'target_path'
+// Constantly valid 'parent_path / executable_path'
+// When those are invalid system is paused or terminates itself.
+//
+// So the idea is to check them on a start.
+// And then keep check on paths, if they're invalidated:
+// - pause system;
+// - validate path (create temporary or something);
+// - unpause system;
+// OR
+// - terminate system (in case we can't find source 'save games' path)
+// AND
+// - keep pathes alive, so system can be:
+//      a) gracefully terminated;
+//      b) or keep working, but stashing files to another directory, e.g
+//         in 'executable_path / tmp_ssstash /'         
+
 fs::path add_timestamp_to_path(const fs::path& target_path) {
 
     auto now = std::chrono::system_clock::now();
