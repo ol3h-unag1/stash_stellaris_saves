@@ -246,6 +246,10 @@ void StashSaves() {
 
     auto saves = get_files_with_extension(exe_path, ".sav");
     std::cout << std::format("I see {} save in '{}' directory", saves.size(), exe_path.string() ) << std::endl;
+//  for (auto const& file : saves)
+//  {
+//       std::cout << file << std::endl;
+//  }
 
     if (saves.empty())
     {
@@ -268,6 +272,11 @@ void StashSaves() {
         std::string const command = std::format("mv {} {}", save, (target_path_timestamp / save).string() );
         execute_terminal_command(command);
     });
+
+    for (auto const& u_save : user_saves)
+    {
+        std::cout << u_save << std::endl;
+    }
 
     auto auto_saves = std::ranges::subrange(saves.begin(), partition_point.begin());
     std::ranges::for_each(auto_saves, [&target_path_timestamp](auto const& save){
