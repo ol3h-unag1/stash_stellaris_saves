@@ -219,6 +219,20 @@ void execute_terminal_command(const std::string& command) {
     return count;
 }
 
+// Function to create and return a sorted reference view
+auto create_sorted_lt_ref_view(auto const& collection) {
+    // Create a vector of reference wrappers to the original strings
+    std::vector<std::reference_wrapper<const std::string>> sorted_refs(collection.begin(), collection.end());
+
+    // Sort the references based on the string values
+    std::ranges::sort(sorted_refs, [](const auto& a, const auto& b) {
+        return a.get() < b.get();
+    });
+
+    // Return the sorted reference view
+    return sorted_refs;
+}
+
 void StashSaves() {
 
 	auto const user_path = GetUserBackUpDirectory();
@@ -266,17 +280,24 @@ void StashSaves() {
     auto partition_point = std::ranges::partition(saves, starts_with_autosave);
 
     // View for "user saves" (not starting with "autosave")
-    auto user_saves = std::ranges::subrange(partition_point.begin(), saves.end());
-    std::ranges::for_each(user_saves, [&target_path_timestamp](auto const& save){
+    auto sorted_user_saves = create_sorted_lt_ref_view(std::ranges::subrange(partition_point.begin(), saves.end()));
+
+    std::cout << "Sorted view: ";
+    for (auto const& file : sorted_user_saves)
+    {
+        std::cout << file.get() << std::endl;
+    }
+
+    std::ranges::for_each(sorted_user_saves, [&target_path_timestamp](auto const& save){
 
         std::string const command = std::format("mv {} {}", save, (target_path_timestamp / save).string() );
         execute_terminal_command(command);
     });
 
-    for (auto const& u_save : user_saves)
-    {
-        std::cout << u_save << std::endl;
-    }
+//  for (auto const& u_save : sorted_user_saves)
+//  {
+//      std::cout << u_save << std::endl;
+//  }
 
     auto auto_saves = std::ranges::subrange(saves.begin(), partition_point.begin());
     std::ranges::for_each(auto_saves, [&target_path_timestamp](auto const& save){
