@@ -127,15 +127,17 @@ std::vector<std::string> get_files_with_extension(const fs::path& directory, con
  * to work on Linux Mint or similar Linux systems.
  *
  * @param command The terminal command to execute as a string.
- * @return int Returns 0 if the command executed successfully, or -1 if it failed.
- *
  * @note The function uses `std::system` to execute the command, which spawns
  *       a shell to run the command. Ensure that the command string is safe
  *       to avoid security risks (e.g., injection attacks).
  */
-bool execute_terminal_command(const std::string& command) {
+void execute_terminal_command(const std::string& command) {
+    
     int result = std::system(command.c_str());
-    return (result == 0) ? true : false; // Return true for success, false for failure
+    if (result != 0)
+    {
+        throw std::invalid_argument("execute_terminal_command: bad command");
+    }
 }
 
 [[nodiscard]] fs::path get_executable_directory() {
@@ -237,7 +239,6 @@ void StashSaves() {
     std::ranges::for_each(user_saves, [&target_path_timestamp](auto const& save){
 
         std::string const command = std::format("mv {} {}", save, (target_path_timestamp / save).string() );
-        //std::cout << command << std::endl;
         execute_terminal_command(command);
     });
 
@@ -245,7 +246,6 @@ void StashSaves() {
     std::ranges::for_each(auto_saves, [&target_path_timestamp](auto const& save){
 
         std::string const command = std::format("cp {} {}", save, (target_path_timestamp / save).string() );
-        //std::cout << command << std::endl;
         execute_terminal_command(command);
     });
 
