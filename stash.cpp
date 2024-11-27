@@ -138,9 +138,14 @@ std::vector<std::string> get_files_with_extension(const fs::path& directory, con
     }
 
     std::vector<std::string> files;
-    for (const auto& entry : fs::directory_iterator(directory)) {
-        if (entry.is_regular_file() && entry.path().extension() == extension) {
+    files.reserve(128);
+    for (const auto& entry : fs::directory_iterator(directory)) 
+    {
+        if (entry.is_regular_file() && 
+            entry.path().extension() == extension) 
+        {
             files.push_back(entry.path().filename().string());
+            std::cout << files.size() << ": " << entry << std::endl;
         }
     }
 
@@ -349,6 +354,30 @@ namespace WorkInProgress
 
         }
 
+    std::vector<std::string> 
+    get_stems_for_extension(
+        const fs::path& directory, 
+        const std::string& extension) {
+
+        if (!fs::exists(directory) || !fs::is_directory(directory)) 
+        {
+            throw std::runtime_error("Invalid directory: " + directory.string());
+        }
+
+        std::vector<std::string> stems;
+        stems.reserve(128);
+        for (const auto& entry : fs::directory_iterator(directory)) 
+        {
+            if (entry.is_regular_file() && entry.path().extension() == extension) 
+            {
+                stems.emplace_back(entry.path().stem().string()); // Use stem() to get the filename without extension
+                std::cout << stems.size() << ": " << entry.path().stem().string() << std::endl;
+            }
+        }
+
+        return stems;
+    }
+
 #define ENSURE_DIR(path) ensure_directory(path, __FILE__, __LINE__)
 
 // returns 0 - if ok 
@@ -374,6 +403,12 @@ int StashSaves(int portion = 50) {
         return 1; // Exit with error code
     }
 
+    auto saves = get_stems_for_extension(exe_path, ".sav");
+    for (auto const& save: saves)
+    {
+        //std::cout << save << std::endl;
+    }
+
 
     return 0;
 }
@@ -384,7 +419,7 @@ int main() {
 
 try 
 {
-    StashSaves(); // go!
+    WorkInProgress::StashSaves(); // go!
 	
 	return 0;
 

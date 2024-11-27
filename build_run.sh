@@ -32,8 +32,8 @@ echo "Files created:"
 ls
 
 # Run the compiled program
-if [[ -f "./stash" ]]; then
-    ./stash
+if [[ -f "./stash_exe" ]]; then
+    ./stash_exe
 else
     echo "Error: Compiled program './stash' not found."
 fi
