@@ -30,13 +30,16 @@ namespace fs = std::filesystem;
 // - pause system;
 // - validate path (create temporary or something);
 // - unpause system;
-// OR
+// And also
 // - terminate system (in case we can't find source 'save games' path)
-// AND
+// And also
 // - keep pathes alive, so system can be:
 //      a) gracefully terminated;
 //      b) or keep working, but stashing files to another directory, e.g
 //         in 'executable_path / tmp_ssstash /'         
+// And also
+// - we can redirect all calls to the system and cache results and only update the if index changes,
+//   so that we know, when we know, that we good
 
 fs::path add_timestamp_to_path(const fs::path& target_path) {
 
