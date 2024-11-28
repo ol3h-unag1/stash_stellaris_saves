@@ -470,25 +470,39 @@ namespace WorkInProgress
         });
 }
 
-std::string_view file_stem(std::string_view path) {
 
-    // Get the positions for the substring
+std::string_view extract_filename(std::string_view path) {
+
+    // Get the position for the substring
     size_t begin = path.rfind('/') + 1; // Position after the last '/'
-    size_t end = path.rfind('.');       // Position of the last '.'
 
-    if (begin < path.size() && end != std::string_view::npos && begin < end) 
+    if (begin < path.size()) 
     {
         // Create a new string_view for the substring [begin, end)
-        return path.substr(begin, end - begin);
-
+        return path.substr(begin);
     } 
     else 
     {
-        throw std::invalid_argument("Invalid path: cannot extract file stem");
+        throw std::invalid_argument("Invalid path: cannot extract filename");
     }
 }
 
+// Extract the file stem (filename without extension)
+std::string_view file_stem(std::string_view path) {
 
+    // Use extract_filename to get the filename
+    std::string_view filename = extract_filename(path);
+
+    // Find the position of the last '.'
+    size_t end = filename.rfind('.');
+    if (end != std::string_view::npos) {
+        // Return the part before the last '.'
+        return filename.substr(0, end);
+    } else {
+        // No '.' found, return the entire filename
+        return filename;
+    }
+}
 
 
 #define ENSURE_DIR(path) ensure_directory(path, __FILE__, __LINE__)
@@ -530,12 +544,32 @@ int StashSaves(int portion = 50, std::string save_file_ext = ".sav") {
     }
 
     // second impl. more healty I guess, less cheap moves to impress girls, more macho stuff: All Heil InitTrInitSortTa!
-    
+
+    // (kek)
+    // anyway, it's fun, for now
+
     // Init:
-    auto const filenames = get_files_by_ext(exe_path, save_file_ext);
+    auto const filenames_abs = get_files_by_ext(exe_path, save_file_ext);
 
     // Transform:
-    auto native_to_strview = filenames 
+    auto filenames_full = filenames_abs 
+        | std::ranges::views::transform(
+            [](fs::path const& p) -> std::string_view
+            {
+                return p.native();
+            });
+
+    std::vector<std::string_view> filenames_full_sv{ native_to_strview.begin(), native_to_strview.end() };
+
+
+    auto filenames = filenames_abs 
+        | std::ranges::views::transform(
+            [](fs::path const& p) -> std::string_view
+            {
+                return extract_filename(p.native());
+            });
+
+    auto stems = filenames_abs 
         | std::ranges::views::transform(
             [](fs::path const& p) -> std::string_view
             {
