@@ -244,9 +244,9 @@ auto sorted_lt_ref_vector(auto const& collection) {
 
 void StashSaves() {
 
-	auto const user_path = GetUserBackUpDirectory();
+    auto const user_path = GetUserBackUpDirectory();
     auto const exe_path = get_executable_directory();
-	auto const target_path = user_path / exe_path.filename();
+    auto const target_path = user_path / exe_path.filename();
     auto const target_path_timestamp = add_timestamp_to_path(target_path);
 
     if (not check_and_create_dir(target_path)) 
@@ -341,21 +341,21 @@ namespace WorkInProgress
     }
 
     // Generalized function for creating directories with detailed exceptions
-        void ensure_directory(
+    void ensure_directory(
             const std::filesystem::path& path, 
             const char* file, 
             Int line){
 
-            if (not std::filesystem::exists(path)) 
+        if (not std::filesystem::exists(path)) 
+        {
+            if (not std::filesystem::create_directory(path)) 
             {
-                if (not std::filesystem::create_directory(path)) 
-                {
-                    std::string msg = std::format("Failed to create directory '{}'. (File: {}, Line: {})", path.string(), file, line);
-                    throw std::runtime_error(msg);
-                }
+                std::string msg = std::format("Failed to create directory '{}'. (File: {}, Line: {})", path.string(), file, line);
+                throw std::runtime_error(msg);
             }
-
         }
+
+    }
 
     auto
     get_stems_for_extension(
@@ -382,6 +382,48 @@ namespace WorkInProgress
         return stems;
     }
 
+    void move_files(
+      const fs::path& source_dir, 
+      const fs::path& target_dir, 
+      auto&& file_stems, 
+      const std::string& ext) {
+      
+        std::for_each(std::execution::par, file_stems.begin(), file_stems.end(), [&](const auto& stem) {
+            fs::path source_path = (source_dir / stem).replace_extension(ext);
+            fs::path target_path = (target_dir / stem).replace_extension(ext);
+
+            if (!fs::exists(source_path)) {
+                std::cerr << "Source file does not exist: " << source_path << '\n';
+                return;
+            }
+
+            if (fs::exists(target_path) && fs::equivalent(source_path, target_path)) {
+                std::cout << "Source and target paths are identical for: " << source_path << ". Skipping." << '\n';
+                return;
+            }
+
+            try 
+            {
+                fs::copy_file(source_path, target_path, fs::copy_options::overwrite_existing);
+                if (not stem.starts_with("autosave")) 
+                {
+                    fs::remove(source_path); // only remove source_path file if stem is not "autosave*"
+                    std::cout << "Moved: " << source_path << " to " << target_path << '\n';
+                }
+                else
+                {
+                    std::cout << "Copied: " << source_path << " to " << target_path << '\n';
+                }
+            
+            } 
+            catch (const fs::filesystem_error& e) 
+            {
+                std::cerr << "Error: " << e.what() << '\n';
+            }
+        });
+}
+
+
 #define ENSURE_DIR(path) ensure_directory(path, __FILE__, __LINE__)
 
 // returns 0 - if ok 
@@ -390,7 +432,7 @@ namespace WorkInProgress
 //           50 by deafault;
 //           out of range values defaults to 50;
 
-int StashSaves(int portion = 50) {
+int StashSaves(int portion = 50, std::string save_file_ext = ".sav") {
 
     portion = std::clamp(portion, 1, 50);
 
@@ -407,21 +449,25 @@ int StashSaves(int portion = 50) {
         return 1; // Exit with error code
     }
 
-    auto saves = get_stems_for_extension(exe_path, ".sav");
+    auto saves = get_stems_for_extension(exe_path, save_file_ext);
     std::vector<std::string_view> view{ saves.begin(), saves.end() };
     std::sort(std::execution::par, view.begin(), view.end());
 
     auto const& sorted_view = view;
     auto resume_view = sorted_view | std::views::take(sorted_view.size() > 0 ? sorted_view.size() - 1 : 0);
+    auto portion_view = resume_view  | std::views::take(portion);
     
+    move_files(exe_path, target_path_timestamp, portion_view, save_file_ext);
+
+/*
     // T_T    
     auto is_auto_save = [](auto&& entry) -> bool { return entry.starts_with("autosave"); };
     auto is_not_auto_save = [&is_auto_save](auto&& entry) -> bool { return not is_auto_save(entry); };
 
-    auto autosave_partion_point = std::ranges::find_if(resume_view, is_not_auto_save);
-    auto autosaves = std::ranges::subrange(resume_view.begin(), autosave_partion_point);
-    auto usersaves = std::ranges::subrange(autosave_partion_point, resume_view.end());
-
+    auto autosave_partion_point = std::ranges::find_if(portion_view, is_not_auto_save);
+    auto autosaves = std::ranges::subrange(portion_view.begin(), autosave_partion_point);
+    auto usersaves = std::ranges::subrange(autosave_partion_point, portion_view.end());
+*/
     auto printer = [&](std::string_view msg, auto&& collection) 
     {
         std::cout << msg << std::endl;
@@ -435,19 +481,18 @@ int StashSaves(int portion = 50) {
 
 #define PRINTER(var) printer(#var ": ", var)
 
-    PRINTER(resume_view);
-    PRINTER(saves);
-    PRINTER(autosaves);
-    PRINTER(usersaves);
+    //PRINTER(resume_view);
+    //PRINTER(saves);
+    //PRINTER(autosaves);
+    //PRINTER(usersaves);
 
-    //printer("resume_view: ", resume_view);
-    //printer("saves: ", saves);
+    //PRINTER(portion_view);
 
 // TODO: we need to avoid useing callse to terminal as passing as tring will end up in the vulnarability? mhm
 // so we do you std::filesystem
 // yeah
 // God-Speed!
-
+// (done - remove comments on next commit with cleaning up code and deprecationg previous version of StashSaves)
     return 0;
 }
 
@@ -458,18 +503,18 @@ int main() {
 try 
 {
     WorkInProgress::StashSaves(); // go!
-	
-	return 0;
+    
+    return 0;
 
 }
 catch (std::exception& e)
 {
-	std::cout << std::format(" +++ +++ +++ Somethin happen bae: {}\n ++ ++ ++ I guess I die ",  e.what()) << std::endl;
-	return 1;
+    std::cout << std::format(" +++ +++ +++ Somethin happen bae: {}\n ++ ++ ++ I guess I die ",  e.what()) << std::endl;
+    return 1;
 }
 catch (...)
 {
-	return 2;
+    return 2;
 }
 
    return -1; // main return
