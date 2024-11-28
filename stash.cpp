@@ -470,6 +470,26 @@ namespace WorkInProgress
         });
 }
 
+std::string_view file_stem(std::string_view path) {
+
+    // Get the positions for the substring
+    size_t begin = path.rfind('/') + 1; // Position after the last '/'
+    size_t end = path.rfind('.');       // Position of the last '.'
+
+    if (begin < path.size() && end != std::string_view::npos && begin < end) 
+    {
+        // Create a new string_view for the substring [begin, end)
+        return path.substr(begin, end - begin);
+
+    } 
+    else 
+    {
+        throw std::invalid_argument("Invalid path: cannot extract file stem");
+    }
+}
+
+
+
 
 #define ENSURE_DIR(path) ensure_directory(path, __FILE__, __LINE__)
 
@@ -509,9 +529,25 @@ int StashSaves(int portion = 50, std::string save_file_ext = ".sav") {
         move_files(exe_path, target_path_timestamp, portion_view, save_file_ext);
     }
 
-    // second impl. more healty I guess, less cheap moves to impress girls, more macho stuff: All Heil InitInitSort!
-    auto filenames = get_files_by_ext(exe_path, save_file_ext);
-    PRINTER(filenames);
+    // second impl. more healty I guess, less cheap moves to impress girls, more macho stuff: All Heil InitTrInitSortTa!
+    
+    // Init:
+    auto const filenames = get_files_by_ext(exe_path, save_file_ext);
+
+    // Transform:
+    auto native_to_strview = filenames 
+        | std::ranges::views::transform(
+            [](fs::path const& p) -> std::string_view
+            {
+                return file_stem(p.native());
+            });
+
+    // Init 2; Sort; Take
+    std::vector<std::string_view> strview{ native_to_strview.begin(), native_to_strview.end() };
+    std::sort(std::execution::par, strview.begin(), strview.end());
+    auto portion_view = strview | std::ranges::views::take(portion < filenames.size() ? portion : 1);
+
+    PRINTER(portion_view);
 
     return 0;
 }
