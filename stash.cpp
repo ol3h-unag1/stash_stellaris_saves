@@ -18,6 +18,19 @@
 
 namespace fs = std::filesystem;
 
+    auto printer = [&](std::string_view msg, auto&& collection) 
+    {
+        std::cout << msg << std::endl;
+        for(auto&& item : collection)
+        {
+            std::cout << item << " -";
+        }
+        std::cout << std::endl;
+    };
+
+
+#define PRINTER(var) printer(#var ": ", var)
+
 
 // TODO:
 // Looking over all those functions I can't get aways from thoughts about pipes.
@@ -458,41 +471,7 @@ int StashSaves(int portion = 50, std::string save_file_ext = ".sav") {
     auto portion_view = resume_view  | std::views::take(portion);
     
     move_files(exe_path, target_path_timestamp, portion_view, save_file_ext);
-
-/*
-    // T_T    
-    auto is_auto_save = [](auto&& entry) -> bool { return entry.starts_with("autosave"); };
-    auto is_not_auto_save = [&is_auto_save](auto&& entry) -> bool { return not is_auto_save(entry); };
-
-    auto autosave_partion_point = std::ranges::find_if(portion_view, is_not_auto_save);
-    auto autosaves = std::ranges::subrange(portion_view.begin(), autosave_partion_point);
-    auto usersaves = std::ranges::subrange(autosave_partion_point, portion_view.end());
-*/
-    auto printer = [&](std::string_view msg, auto&& collection) 
-    {
-        std::cout << msg << std::endl;
-        for(auto&& item : collection)
-        {
-            std::cout << item << " -";
-        }
-        std::cout << std::endl;
-    };
-
-
-#define PRINTER(var) printer(#var ": ", var)
-
-    //PRINTER(resume_view);
-    //PRINTER(saves);
-    //PRINTER(autosaves);
-    //PRINTER(usersaves);
-
-    //PRINTER(portion_view);
-
-// TODO: we need to avoid useing callse to terminal as passing as tring will end up in the vulnarability? mhm
-// so we do you std::filesystem
-// yeah
-// God-Speed!
-// (done - remove comments on next commit with cleaning up code and deprecationg previous version of StashSaves)
+    
     return 0;
 }
 
