@@ -18,7 +18,7 @@
 
 namespace fs = std::filesystem;
 
-    auto printer = [&](std::string_view msg, auto&& collection) 
+    auto printer = [](std::string_view msg, auto&& collection) 
     {
         std::cout << msg << std::endl;
         for(auto&& item : collection)
@@ -343,6 +343,40 @@ namespace WorkInProgress
 
     using Int = int;
 
+    auto
+    get_files_by_ext(
+        std::filesystem::path where, 
+        std::string_view extension) {
+
+        std::vector<fs::path> files;
+
+        try 
+        {
+            if (fs::exists(where) && fs::is_directory(where)) 
+            {
+                files.reserve(128);
+                for (const auto& entry : fs::directory_iterator(where)) 
+                {
+                    if (entry.is_regular_file() && entry.path().extension() == extension) 
+                    {
+                        files.push_back(entry.path().string());
+                    }
+                }
+            } 
+            else 
+            {
+                std::cerr << "Error: Path does not exist or is not a directory." << std::endl;
+            }
+        } 
+        catch (const fs::filesystem_error& e) 
+        {
+            std::cerr << "Filesystem error: " << e.what() << std::endl;
+        }
+
+        return files;
+    }
+
+
     auto GeneratePaths() {
 
         auto const user_path = GetUserBackUpDirectory();
@@ -462,16 +496,23 @@ int StashSaves(int portion = 50, std::string save_file_ext = ".sav") {
         return 1; // Exit with error code
     }
 
-    auto saves = get_stems_for_extension(exe_path, save_file_ext);
-    std::vector<std::string_view> view{ saves.begin(), saves.end() };
-    std::sort(std::execution::par, view.begin(), view.end());
+    if (false) // first impl
+    {
+        auto saves = get_stems_for_extension(exe_path, save_file_ext);
+        std::vector<std::string_view> view{ saves.begin(), saves.end() };
+        std::sort(std::execution::par, view.begin(), view.end());
 
-    auto const& sorted_view = view;
-    auto resume_view = sorted_view | std::views::take(sorted_view.size() > 0 ? sorted_view.size() - 1 : 0);
-    auto portion_view = resume_view  | std::views::take(portion);
-    
-    move_files(exe_path, target_path_timestamp, portion_view, save_file_ext);
-    
+        auto const& sorted_view = view;
+        auto resume_view = sorted_view | std::views::take(sorted_view.size() > 0 ? sorted_view.size() - 1 : 0);
+        auto portion_view = resume_view  | std::views::take(portion);
+        
+        move_files(exe_path, target_path_timestamp, portion_view, save_file_ext);
+    }
+
+    // second impl. more healty I guess, less cheap moves to impress girls, more macho stuff: All Heil InitInitSort!
+    auto filenames = get_files_by_ext(exe_path, save_file_ext);
+    PRINTER(filenames);
+
     return 0;
 }
 
