@@ -411,12 +411,37 @@ int StashSaves(int portion = 50) {
     std::vector<std::string_view> view{ saves.begin(), saves.end() };
     std::sort(std::execution::par, view.begin(), view.end());
 
-    auto const& saves_ref_view = view;
+    auto const& sorted_view = view;
+    auto resume_view = sorted_view | std::views::take(sorted_view.size() > 0 ? sorted_view.size() - 1 : 0);
     
-    for(std::size_t index = 0u; index < saves.size(); ++index)
+    // T_T    
+    auto is_auto_save = [](auto&& entry) -> bool { return entry.starts_with("autosave"); };
+    auto is_not_auto_save = [&is_auto_save](auto&& entry) -> bool { return not is_auto_save(entry); };
+
+    auto autosave_partion_point = std::ranges::find_if(resume_view, is_not_auto_save);
+    auto autosaves = std::ranges::subrange(resume_view.begin(), autosave_partion_point);
+
+    auto printer = [&](std::string_view msg, auto&& collection) 
     {
-        std::cout << saves_ref_view[index] << std::endl;
-    }
+        std::cout << msg << std::endl;
+        for(auto&& item : collection)
+        {
+            std::cout << item << " -";
+        }
+        std::cout << std::endl;
+    };
+
+
+#define PRINTER(var) printer(#var ": ", var)
+
+    PRINTER(resume_view);
+    PRINTER(saves);
+    PRINTER(autosaves);
+
+    //printer("resume_view: ", resume_view);
+    //printer("saves: ", saves);
+
+
 
     return 0;
 }
