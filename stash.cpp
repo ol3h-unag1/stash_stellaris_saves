@@ -420,6 +420,7 @@ int StashSaves(int portion = 50) {
 
     auto autosave_partion_point = std::ranges::find_if(resume_view, is_not_auto_save);
     auto autosaves = std::ranges::subrange(resume_view.begin(), autosave_partion_point);
+    auto usersaves = std::ranges::subrange(autosave_partion_point, resume_view.end());
 
     auto printer = [&](std::string_view msg, auto&& collection) 
     {
@@ -437,6 +438,7 @@ int StashSaves(int portion = 50) {
     PRINTER(resume_view);
     PRINTER(saves);
     PRINTER(autosaves);
+    PRINTER(usersaves);
 
     //printer("resume_view: ", resume_view);
     //printer("saves: ", saves);
