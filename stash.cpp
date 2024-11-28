@@ -12,6 +12,9 @@
 #include <unistd.h>
 
 #include <exception>
+#include <execution> // For parallel execution policies
+#include <string_view>
+
 
 namespace fs = std::filesystem;
 
@@ -354,7 +357,7 @@ namespace WorkInProgress
 
         }
 
-    std::vector<std::string> 
+    auto
     get_stems_for_extension(
         const fs::path& directory, 
         const std::string& extension) {
@@ -366,12 +369,17 @@ namespace WorkInProgress
 
         std::vector<std::string> stems;
         stems.reserve(128);
+
+        std::vector<std::string_view> view;
+        view.reserve(stems.capacity());
+
         for (const auto& entry : fs::directory_iterator(directory)) 
         {
             if (entry.is_regular_file() && entry.path().extension() == extension) 
             {
                 stems.emplace_back(entry.path().stem().string()); // Use stem() to get the filename without extension
-                std::cout << stems.size() << ": " << entry.path().stem().string() << std::endl;
+                view.emplace_back(stems.back());
+                //std::cout << stems.size() << ": " << entry.path().stem().string() << std::endl;
             }
         }
 
@@ -403,12 +411,44 @@ int StashSaves(int portion = 50) {
         return 1; // Exit with error code
     }
 
-    auto saves = get_stems_for_extension(exe_path, ".sav");
-    for (auto const& save: saves)
-    {
-        //std::cout << save << std::endl;
-    }
+    auto const saves = get_stems_for_extension(exe_path, ".sav");
 
+    /*
+    // Define a lambda for projecting the collection
+    auto project = [&]
+    (auto&& collection,
+     auto&& callback) 
+    {
+        for (auto const& item : collection) 
+        {
+            std::string_view view(item);
+            callback(view);
+        }
+    };
+
+    project(saves, [&saves_ref](std::string_view view)
+    {
+        saves_ref.push_back(view);
+    });
+    */
+
+    std::vector<std::string_view> saves_ref_view = saves_ref;
+
+
+/*    auto saves_ref_view = 
+        saves 
+        | std::views::transform(
+            [](std::string const& s) -> std::string_view 
+            { 
+                return s; 
+
+            });
+*/
+    
+    for(std::size_t index = 0u; index < saves.size(); ++index)
+    {
+        std::cout << saves_ref_view[index] << std::endl;
+    }
 
     return 0;
 }
