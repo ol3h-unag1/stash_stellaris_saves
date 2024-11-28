@@ -559,29 +559,16 @@ int StashSaves(int portion = 50, std::string save_file_ext = ".sav") {
                 return p.native();
             });
 
-    std::vector<std::string_view> filenames_full_sv{ native_to_strview.begin(), native_to_strview.end() };
+    std::vector<std::string_view> filenames_full_sv{ filenames_full.begin(), filenames_full.end() };
+    // sort with predicate file_stem(left) < file_stem(right)
 
-
-    auto filenames = filenames_abs 
-        | std::ranges::views::transform(
-            [](fs::path const& p) -> std::string_view
-            {
-                return extract_filename(p.native());
-            });
-
-    auto stems = filenames_abs 
-        | std::ranges::views::transform(
-            [](fs::path const& p) -> std::string_view
-            {
-                return file_stem(p.native());
-            });
 
     // Init 2; Sort; Take
-    std::vector<std::string_view> strview{ native_to_strview.begin(), native_to_strview.end() };
-    std::sort(std::execution::par, strview.begin(), strview.end());
-    auto portion_view = strview | std::ranges::views::take(portion < filenames.size() ? portion : 1);
+    //std::vector<std::string_view> strview{ native_to_strview.begin(), native_to_strview.end() };
+    //std::sort(std::execution::par, strview.begin(), strview.end());
+    //auto portion_view = strview | std::ranges::views::take(portion < filenames.size() ? portion : 1);
 
-    PRINTER(portion_view);
+    //PRINTER(portion_view);
 
     return 0;
 }
@@ -592,7 +579,8 @@ int main() {
 
 try 
 {
-    WorkInProgress::StashSaves(); // go!
+    //WorkInProgress::StashSaves(); // go!
+    StashSaves();
     
     return 0;
 
