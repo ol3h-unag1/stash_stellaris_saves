@@ -443,7 +443,10 @@ int StashSaves(int portion = 50) {
     //printer("resume_view: ", resume_view);
     //printer("saves: ", saves);
 
-
+// TODO: we need to avoid useing callse to terminal as passing as tring will end up in the vulnarability? mhm
+// so we do you std::filesystem
+// yeah
+// God-Speed!
 
     return 0;
 }
