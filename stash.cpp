@@ -371,7 +371,7 @@ namespace WorkInProgress
         stems.reserve(128);
 
         std::vector<std::string_view> view;
-        view.reserve(stems.capacity());
+        view.reserve(128);
 
         for (const auto& entry : fs::directory_iterator(directory)) 
         {
@@ -383,7 +383,7 @@ namespace WorkInProgress
             }
         }
 
-        return stems;
+        return std::make_tuple(stems, view);
     }
 
 #define ENSURE_DIR(path) ensure_directory(path, __FILE__, __LINE__)
