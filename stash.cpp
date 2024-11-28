@@ -14,7 +14,7 @@
 #include <exception>
 #include <execution> // For parallel execution policies
 #include <string_view>
-
+#include <utility>
 
 namespace fs = std::filesystem;
 
@@ -370,20 +370,16 @@ namespace WorkInProgress
         std::vector<std::string> stems;
         stems.reserve(128);
 
-        std::vector<std::string_view> view;
-        view.reserve(128);
-
         for (const auto& entry : fs::directory_iterator(directory)) 
         {
             if (entry.is_regular_file() && entry.path().extension() == extension) 
             {
                 stems.emplace_back(entry.path().stem().string()); // Use stem() to get the filename without extension
-                view.emplace_back(stems.back());
                 //std::cout << stems.size() << ": " << entry.path().stem().string() << std::endl;
             }
         }
 
-        return std::make_tuple(stems, view);
+        return stems;
     }
 
 #define ENSURE_DIR(path) ensure_directory(path, __FILE__, __LINE__)
@@ -411,39 +407,11 @@ int StashSaves(int portion = 50) {
         return 1; // Exit with error code
     }
 
-    auto const saves = get_stems_for_extension(exe_path, ".sav");
+    auto saves = get_stems_for_extension(exe_path, ".sav");
+    std::vector<std::string_view> view{ saves.begin(), saves.end() };
+    std::sort(std::execution::par, view.begin(), view.end());
 
-    /*
-    // Define a lambda for projecting the collection
-    auto project = [&]
-    (auto&& collection,
-     auto&& callback) 
-    {
-        for (auto const& item : collection) 
-        {
-            std::string_view view(item);
-            callback(view);
-        }
-    };
-
-    project(saves, [&saves_ref](std::string_view view)
-    {
-        saves_ref.push_back(view);
-    });
-    */
-
-    std::vector<std::string_view> saves_ref_view = saves_ref;
-
-
-/*    auto saves_ref_view = 
-        saves 
-        | std::views::transform(
-            [](std::string const& s) -> std::string_view 
-            { 
-                return s; 
-
-            });
-*/
+    auto const& saves_ref_view = view;
     
     for(std::size_t index = 0u; index < saves.size(); ++index)
     {
