@@ -429,7 +429,7 @@ namespace WorkInProgress
         return stems;
     }
 
-    void move_files(
+    void move_files_deprecated(
       const fs::path& source_dir, 
       const fs::path& target_dir, 
       auto&& file_stems, 
@@ -468,7 +468,7 @@ namespace WorkInProgress
                 std::cerr << "Error: " << e.what() << '\n';
             }
         });
-}
+    }
 
 
 std::string_view extract_filename(std::string_view path) {
@@ -504,6 +504,39 @@ std::string_view file_stem(std::string_view path) {
     }
 }
 
+void move_files(fs::path const& target_dir, auto&& files) {
+  
+    auto is_autosave = [](auto&& stem) -> bool
+    {
+        static std::string_view const autosave_stem = "autosave";    
+        auto stem_substr = stem.substr(0, autosave_stem.size());
+        return (0 == autosave_stem.compare(stem_substr));
+    };
+
+    std::for_each(std::execution::par, files.begin(), files.end(), [&](auto&& file) {
+        auto filename = extract_filename(file);
+        fs::path target_path = target_dir / filename;
+
+        try 
+        {
+            fs::copy_file(file, target_path, fs::copy_options::overwrite_existing);
+            if (not is_autosave(file_stem(file))) // o_O heavy shiiit
+            {
+                fs::remove(file); // only remove source_path file if stem is not "autosave*"
+                std::cout << "Moved: " << filename << " to " << target_dir << '\n';
+            }
+            else
+            {
+                std::cout << "Copied: " << filename << " to " << target_dir << '\n';
+            }
+        } 
+        catch (const fs::filesystem_error& e) 
+        {
+            std::cerr << "Error: " << e.what() << '\n';
+        }
+    });
+}
+
 
 #define ENSURE_DIR(path) ensure_directory(path, __FILE__, __LINE__)
 
@@ -513,9 +546,7 @@ std::string_view file_stem(std::string_view path) {
 //           50 by deafault;
 //           out of range values defaults to 50;
 
-int StashSaves(int portion = 50, std::string save_file_ext = ".sav") {
-
-    portion = std::clamp(portion, 1, 50);
+Int StashSaves(Int portion = 50, std::string save_file_ext = ".sav") {
 
     auto [user_path, exe_path, target_path, target_path_timestamp] = GeneratePaths();
 
@@ -530,44 +561,42 @@ int StashSaves(int portion = 50, std::string save_file_ext = ".sav") {
         return 1; // Exit with error code
     }
 
-    if (false) // first impl
-    {
-        auto saves = get_stems_for_extension(exe_path, save_file_ext);
-        std::vector<std::string_view> view{ saves.begin(), saves.end() };
-        std::sort(std::execution::par, view.begin(), view.end());
-
-        auto const& sorted_view = view;
-        auto resume_view = sorted_view | std::views::take(sorted_view.size() > 0 ? sorted_view.size() - 1 : 0);
-        auto portion_view = resume_view  | std::views::take(portion);
-        
-        move_files(exe_path, target_path_timestamp, portion_view, save_file_ext);
-    }
-
-    // second impl. more healty I guess, less cheap moves to impress girls, more macho stuff: All Heil InitTrInitSortTa!
-
-    // (kek)
-    // anyway, it's fun, for now
-
     // Init:
-    auto const filenames_abs = get_files_by_ext(exe_path, save_file_ext);
+    auto const fullpaths = get_files_by_ext(exe_path, save_file_ext);
 
     // Transform:
-    auto filenames_full = filenames_abs 
+    auto files = fullpaths 
         | std::ranges::views::transform(
             [](fs::path const& p) -> std::string_view
             {
                 return p.native();
             });
 
-    std::vector<std::string_view> filenames_full_sv{ filenames_full.begin(), filenames_full.end() };
-    // sort with predicate file_stem(left) < file_stem(right)
+    // Sort:
+    std::vector<std::string_view> files_sv{ files.begin(), files.end() };
+    std::sort(std::execution::par, files_sv.begin(), files_sv.end(), 
+        [](std::string_view left, std::string_view right) 
+        {
+            return file_stem(left) < file_stem(right);
+        });
 
+    // Chunk:
+    auto get_portion = [&portion, &files_sv]() -> Int {
+        
+        Int p = std::clamp(portion, 1, 50);
+        if (files_sv.size() <= p)
+        {
+            p = files_sv.size() < 2 ? 0 : files_sv.size() - 1;
+        }
 
-    // Init 2; Sort; Take
-    //std::vector<std::string_view> strview{ native_to_strview.begin(), native_to_strview.end() };
-    //std::sort(std::execution::par, strview.begin(), strview.end());
-    //auto portion_view = strview | std::ranges::views::take(portion < filenames.size() ? portion : 1);
+        return p;
+    };
+    auto portion_view = files_sv | std::ranges::views::take(get_portion());
 
+    // Move:
+    move_files(target_path_timestamp, portion_view);
+
+    // Debug:
     //PRINTER(portion_view);
 
     return 0;
@@ -579,8 +608,8 @@ int main() {
 
 try 
 {
-    //WorkInProgress::StashSaves(); // go!
-    StashSaves();
+    WorkInProgress::StashSaves(); // go!
+    //StashSaves();
     
     return 0;
 
