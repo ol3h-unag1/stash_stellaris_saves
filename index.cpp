@@ -1,11 +1,8 @@
 #include <sys/inotify.h>
-
 #include <iostream>
 #include <string>
 #include <vector>
-
 #include <filesystem>
-
 #include <unistd.h>
 
 namespace fs = std::filesystem;
@@ -45,7 +42,14 @@ void monitor_directory(const std::string& directory) {
 
             // Handle different types of events
             if (event->mask & IN_CREATE)
+            {
                 std::cout << "File created: " << event->name << '\n';
+                // Vlad: call index_service_test with filename
+                // for example you can reuse execute_terminal_command and pass
+                // "./index_service_test usersave001.sav" it's argument 
+
+            }
+
             if (event->mask & IN_DELETE)
                 std::cout << "File deleted: " << event->name << '\n';
             if (event->mask & IN_MODIFY)
@@ -60,27 +64,22 @@ void monitor_directory(const std::string& directory) {
     close(inotify_fd);
 }
 
-[[nodiscard]] fs::path get_executable_directory() {
-    char exe_path[1024];
-    ssize_t len = readlink("/proc/self/exe", exe_path, sizeof(exe_path) - 1);
-    if (len == -1) {
-        throw std::runtime_error("Unable to determine executable path.");
+int main(int argc, char* argv[]) {
+    if (argc != 3) {
+        std::cerr << "Usage: " << argv[0] << " <directory_to_monitor> <index_service_test_exe_path>\n";
+        return 1;
     }
-    exe_path[len] = '\0'; // Null-terminate the path
-    return fs::path(exe_path).parent_path();
-}
 
+    std::string directory = argv[1];
+    std::string index_service_test_exe_path = argv[2];
 
-int main() 
-{
-    
-    auto directory = get_executable_directory();
-
-    if (!std::filesystem::exists(directory) || !std::filesystem::is_directory(directory)) 
-    {
+    if (!fs::exists(directory) || !fs::is_directory(directory)) {
         std::cerr << "Error: Directory does not exist or is not a directory: " << directory << '\n';
         return 1;
     }
+
+    std::cout << "Directory to monitor: " << directory << '\n';
+    std::cout << "Output message: " << index_service_test_exe_path << '\n';
 
     monitor_directory(directory);
 
