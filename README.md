@@ -1,37 +1,65 @@
+
 # stash_stellaris_saves
 
+## Overview
 
-Requirements for Vlad:
+`stash_stellaris_saves` is a lightweight file indexing service designed to monitor a directory for file changes and notify a specified client when new files are added.
 
-Non-funcitonal:
-Read example of inotify API is in index.cpp. 
-Build index.cpp, run. Add, delete, move, copy-in-out files in directory. 
-See output of index.cpp object.
-Build with:
-g++ -std=c++23 -o index_service index.cpp -Ofast
+## Features
 
-Use ChatGPT extensively.
+- Runs indefinitely to monitor a directory.
+- Notifies a client executable with the name of newly added files.
+- Flexible and easily extendable for various use cases.
 
-Functional:
-I need you to write index service that will notify client about file beeing added to directory:
+## Requirements
 
-	1) Service should run indefinetly.
-		1.a) Until killed with some kill -N pid from parent process.
-	2) Service should read a parameter, that's a path to target directory where service will monitor changes in filesystem (index).
-		2.a) Be read as passed argument
-	3) When target's directory index changed, service should notify client.
-		3.a) Read client's executable path as passed argument, call it passing path to newly created dile as an argument.
+- C++ compiler supporting C++23 (e.g., `g++`).
+- Familiarity with building and running C++ applications.
 
-Example of usage:
-	./index_service '/home/user451/Paradox Interactive/Stellaris/save games/vladoid_cosmosa20240112/' '/home/user451/stashss/stash_exe'
-	
-Example of call to client:		
-	/home/holep/mone666/stash_exe '2253.08.21.sav'
+## Getting Started
 
+### Building and Running the Example
 
-Tips.
-There's execute_terminal_command in repository. It's easier way to call the client back.
-build_run.sh from repository have examples of how to generate files, ask GPT to do something for yourself to create files by timer.
-If you need something to test you component agains - talk to me.
+1. Test the inotify API using `index.cpp` (example provided in the repository).
+2. Build and run the example:
+   ```bash
+   g++ -std=c++23 -o index_service index.cpp -Ofast
+   ./index_service
+   ```
+3. Observe the output as you add, delete, or move files in the target directory.
 
-Good luck!
+### Building and Running the Service
+
+1. Compile the service:
+   ```bash
+   g++ -std=c++23 -o index_service index_service.cpp -Ofast
+   ```
+2. Run the service, passing the path to the directory to monitor and the client executable:
+   ```bash
+   ./index_service "/path/to/watch/" "/path/to/client/"
+   ```
+   Example:
+   ```bash
+   ./index_service "/home/user/Stellaris/saves/" "/home/user/stashss/stash_exe"
+   ```
+
+### Client Notification
+
+When a new file is added to the monitored directory, the service executes the client with the file name as an argument. Example call to the client:
+```bash
+/path/to/client/newly_added_file_name
+```
+
+## Tips
+
+- Use `execute_terminal_command` (provided in the repository) for simpler client calls.
+- Use `build_run.sh` for automated file generation and testing.
+- Explore and experiment—there’s wide leeway for customization.
+
+## Contributing
+
+Contributions are welcome! Feel free to submit issues or pull requests.
+
+---
+
+**Good luck!**
