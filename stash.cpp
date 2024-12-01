@@ -537,6 +537,34 @@ void move_files(fs::path const& target_dir, auto&& files) {
     });
 }
 
+void move_file(fs::path const& target_path, fs::path const& file) {
+
+    auto is_autosave = [](auto&& stem) -> bool
+    {
+        static std::string_view const autosave_stem = "autosave";    
+        auto stem_substr = stem.substr(0, autosave_stem.size());
+        return (0 == autosave_stem.compare(stem_substr));
+    };
+
+    try
+    {
+        fs::copy_file(file, target_path, fs::copy_options::overwrite_existing);
+        if (not is_autosave(file_stem(file.string()))) // o_O heavy shiiit
+        {
+            fs::remove(file); // only remove source_path file if stem is not "autosave*"
+            std::cout << "Moved: " << file << " to " << target_path << '\n';
+        }
+        else
+        {
+            std::cout << "Copied: " << file << " to " << target_path << '\n';
+        }
+    }
+    catch (const fs::filesystem_error& e) 
+    {
+        std::cerr << "Error: " << e.what() << '\n';
+    }
+}
+
 
 #define ENSURE_DIR(path) ensure_directory(path, __FILE__, __LINE__)
 
@@ -608,7 +636,9 @@ int main() {
 
 try 
 {
-    WorkInProgress::StashSaves(); // go!
+    //WorkInProgress::StashSaves(); // go!
+    // TODO: we need to focus on component interaction, so simplifying interfaces
+    // TODO: use move_file
     //StashSaves();
     
     return 0;
