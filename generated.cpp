@@ -14,7 +14,7 @@ public:
     Monitor(std::size_t portion_size = 50) 
     : _stop(false)
     , _portion_size(portion_size) {
-        
+
         // Start a background thread
         _monitorThread = std::thread(&Monitor::monitorFunction, this);
     }
@@ -33,7 +33,7 @@ public:
         std::lock_guard<std::mutex> lock(_mtx);
         _filenames.push_back(filename);
         _cv.notify_all();
-    }
+    }xza
 
 private:
     std::size_t _portion_size;
