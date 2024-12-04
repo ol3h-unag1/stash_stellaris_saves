@@ -4,23 +4,15 @@
 namespace StashSaves::Util
 {
 
-std::vector<std::string> v1::generate_paths()  {
 
-    std::vector<std::string> paths;
-    paths.emplace_back("/home/user/Documents/file1.txt");
-    paths.emplace_back("/home/user/Documents/file2.txt");
-    paths.emplace_back("/home/user/Documents/file3.txt");
-    paths.emplace_back("/home/user/Documents/file4.txt");
+Tuple3Str v1::generate_paths()  {
 
-    return paths;
+    return std::make_tuple("Alice", "Bob", "Charlie");
 }
 
-std::vector<std::string> v2::generate_paths() {
-    std::vector<std::string> paths;
-    paths.emplace_back("/home/user/Documents/file1.txt");
-    paths.emplace_back("/home/user/Documents/file2.txt");
+bool is_directory_exists(const std::string& path) {
 
-    return paths;
+    return fs::exists(path) && fs::is_directory(path);
 }
 
 
@@ -30,6 +22,9 @@ std::vector<std::string> v2::generate_paths() {
 int main()
 {
 	namespace util = StashSaves::Util;
-	std::cout << util::generate_paths().size() << std::endl;
-	std::cout << util::v2::generate_paths().size() << std::endl;
+	//std::cout << util::generate_paths().size() << std::endl;
+	auto [a,b,c] = util::generate_paths();
+	std::cout << a << std::endl;
+	std::cout << b << std::endl;
+	std::cout << c << std::endl;
 }

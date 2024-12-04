@@ -1,0 +1,29 @@
+#pragma once
+#include <filesystem>
+
+namespace StashSaves::Component
+{
+inline namespace v1
+{
+
+namespace fs = std::filesystem;
+
+class Monitor
+{
+
+public:
+	Monitor();
+
+public:
+	void start();
+
+private:
+	void init();
+
+private:
+	fs::path _saves;
+	fs::path _backup;
+};
+
+} // end of namespace StashSaves::Component::v1
+} // end of namespace StashSaves::Component
