@@ -8,14 +8,7 @@ namespace StashSaves::Component
 
 v1::Monitor::Monitor() {
 
-	try 
-	{
 		init();
-	}
-	catch(std::exception& e)
-	{
-		std::cout << e.what() << std::endl;
-	}
 }
 
 void v1::Monitor::init() {
