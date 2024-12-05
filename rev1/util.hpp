@@ -16,7 +16,7 @@ Tuple3Str generate_paths();
 
 bool is_directory_exists(const std::string& path);
 
-std::string get_current_username();
+fs::path get_current_username();
 
 } // end namespace StashSaves::Util::v1
 

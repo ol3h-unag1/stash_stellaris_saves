@@ -20,7 +20,7 @@ bool v1::is_directory_exists(const std::string& path) {
     return fs::exists(path) && fs::is_directory(path);
 }
 
-std::string v1::get_current_username() {
+fs::path v1::get_current_username() {
 
     if (const char* username = getenv("USER"); username != nullptr) 
     {

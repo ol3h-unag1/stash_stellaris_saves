@@ -6,8 +6,6 @@ namespace StashSaves::Component
 inline namespace v1
 {
 
-const char* G_game_path = ".local/share/Paradox Interactive/Stellaris/save games/";
-
 namespace fs = std::filesystem;
 
 class Monitor

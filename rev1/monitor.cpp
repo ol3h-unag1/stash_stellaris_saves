@@ -1,10 +1,20 @@
 #include <iostream>
+#include <exception>
 
 #include "monitor.hpp"
 #include "util.hpp"
 
 namespace StashSaves::Component 
 {
+
+const char* G_game_path = ".local/share/Paradox Interactive/Stellaris/save games/";
+
+// will build a path where keeps its saves ;)
+auto base_path(auto&& user_name, auto&& local_game_saves_path) {
+
+    fs::path base_path = "/home" / user_name / local_game_saves_path;
+    return base_path;
+}
 
 v1::Monitor::Monitor() {
 
@@ -13,8 +23,7 @@ v1::Monitor::Monitor() {
 
 void v1::Monitor::init() {
 
-	fs::path username = Util::get_current_username();
-
+	_saves = base_path(Util::get_current_username(), G_game_path);
 
 		// get game saves directory
 			// get user directory
@@ -22,7 +31,12 @@ void v1::Monitor::init() {
 		// create back up directory
 		// spawn index
 
-    std::cout << "Monitor initialized" << std::endl;
+	if (not Util::is_directory_exists(_saves))
+	{
+	    throw std::runtime_error("Directory does not exist: " + _saves.string());
+	}
+	
+    std::cout << "Monitor initialized: " << _saves << std::endl;
 }
 
 void v1::Monitor::start() {
