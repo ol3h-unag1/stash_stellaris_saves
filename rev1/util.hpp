@@ -10,12 +10,13 @@ using Tuple3Str = std::tuple<std::string, std::string, std::string>;
 inline namespace v1
 {
 
+namespace fs = std::filesystem;
 
 Tuple3Str generate_paths();
 
 bool is_directory_exists(const std::string& path);
 
-
+std::string get_current_username();
 
 } // end namespace StashSaves::Util::v1
 

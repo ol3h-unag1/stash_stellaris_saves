@@ -13,7 +13,12 @@ v1::Monitor::Monitor() {
 
 void v1::Monitor::init() {
 
+	fs::path username = Util::get_current_username();
+
+
 		// get game saves directory
+			// get user directory
+		    // checko for stellaris saves dir in it
 		// create back up directory
 		// spawn index
 
@@ -36,6 +41,8 @@ int main()
 	mon.start();
 
 	std::cout << "monitor::main()" << std::endl;
+ 	std::cout << std::filesystem::current_path() << std::endl;
+
 
 	return 0;
 }

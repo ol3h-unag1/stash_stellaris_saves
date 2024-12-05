@@ -199,14 +199,18 @@ void execute_terminal_command(const std::string& command) {
     return fs::path(exe_path).parent_path();
 }
 
-[[nodiscard]] std::string get_current_username() {
-    if (const char* username = getenv("USER"); username != nullptr) {
+std::string get_current_username() {
+
+    if (const char* username = getenv("USER"); username != nullptr) 
+    {
         return username;
     }
-    if (struct passwd* pw = getpwuid(getuid()); pw != nullptr) {
+
+    if (struct passwd* pw = getpwuid(getuid()); pw != nullptr) 
+    {
         return pw->pw_name;
     }
-    return "Unknown";
+    return "";
 }
 
 [[nodiscard]] auto GetUserBackUpDirectory() {
