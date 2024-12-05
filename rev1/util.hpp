@@ -2,6 +2,7 @@
 
 #include <tuple>
 #include <string>
+#include <filesystem>
 
 namespace StashSaves::Util
 {
