@@ -3,6 +3,7 @@
 
 #include "monitor.hpp"
 #include "util.hpp"
+#include "index.hpp"
 
 namespace StashSaves::Component 
 {
@@ -17,6 +18,7 @@ auto base_path(auto&& user_name, auto&& local_game_saves_path) {
     return base_path;
 }
 
+// c-tor definition
 v1::Monitor::Monitor() {
 	
 	try
@@ -30,6 +32,7 @@ v1::Monitor::Monitor() {
 	}
 }
 
+
 void v1::Monitor::init() {
 
 		// get game saves directory
@@ -37,6 +40,9 @@ void v1::Monitor::init() {
 		    // checko for stellaris saves dir in it
 		// create back up directory
 		// spawn index into Empire's subfolders
+		// back up something that's already over the limit of files
+		// ..
+	    //
 
 	auto const current_user = Util::get_current_username();
 	_saves = base_path(current_user, G_game_path);
@@ -66,7 +72,9 @@ void v1::Monitor::init() {
 	    std::cout << "Backup directory has been created: " << _backup << std::endl;;
 	}
 	
-    std::cout << "Monitor initialized: " << _saves << " #$$# " << _backup << std::endl;
+	_index = std::make_unique<Index>();
+
+    std::cout << "Monitor initialized: " << _saves << "#\n#" << _backup << " #\n#" << "index: " << _index->get_index() << "#\n#";
 }
 
 void v1::Monitor::start() {
