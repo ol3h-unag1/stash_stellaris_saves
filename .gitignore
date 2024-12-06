@@ -1,4 +1,5 @@
 *.swp
 *.sav
 *_exe
+*generated*
 wip*

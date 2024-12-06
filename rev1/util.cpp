@@ -1,5 +1,6 @@
 #include <iostream>
 #include <filesystem>
+#include <vector>
 
 #include <cstdlib>    // for getenv
 #include <unistd.h>   // for getuid
@@ -34,16 +35,17 @@ fs::path v1::get_current_username() {
     return "";
 }
 
-} // end namespace StashSaves::Util
+std::vector<fs::path> get_subdirectories(const fs::path& dir) {
 
-/*
-int main()
-{
-	namespace util = StashSaves::Util;
-	//std::cout << util::generate_paths().size() << std::endl;
-	auto [a,b,c] = util::generate_paths();
-	std::cout << a << std::endl;
-	std::cout << b << std::endl;
-	std::cout << c << std::endl;
+    std::vector<fs::path> subdirectories;
+    // Use directory_iterator for non-recursive traversal
+    for (const auto& entry : fs::directory_iterator(dir)) {
+        if (entry.is_directory()) { // Check if the entry is a directory
+            subdirectories.push_back(entry.path());
+        }
+    }
+    
+    return subdirectories;
 }
-*/
+
+} // end namespace StashSaves::Util

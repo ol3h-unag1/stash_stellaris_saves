@@ -16,7 +16,7 @@ namespace StashSaves::Component
 
 		try
 		{
-			watch_dir(dir_to_watch);
+			//watch_dir(dir_to_watch);
 		}
 		catch (std::exception& e)
 		{
@@ -26,6 +26,7 @@ namespace StashSaves::Component
 	
 	}
 
+	// inotify implementation
 	void v1::Index::watch_dir(fs::path directory) {
 
 	    // Initialize inotify
