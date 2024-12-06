@@ -12,7 +12,6 @@ class Index;
 
 namespace fs = std::filesystem;
 
-
 class Monitor
 {
 

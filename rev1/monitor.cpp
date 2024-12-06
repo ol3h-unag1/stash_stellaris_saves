@@ -8,7 +8,8 @@
 namespace StashSaves::Component 
 {
 
-const char* G_game_path = ".local/share/Paradox Interactive/Stellaris/save games/";
+//const char* G_game_path = ".local/share/Paradox Interactive/Stellaris/save games/"; // real dir
+const char* G_game_path = "Stellaris/Saves/"; // test dir
 const char* G_user_backup_path = "stash_saver/Stellaris/save games/";
 
 // will build a path where keeps its saves ;)
@@ -72,7 +73,7 @@ void v1::Monitor::init() {
 	    std::cout << "Backup directory has been created: " << _backup << std::endl;;
 	}
 	
-	_index = std::make_unique<Index>();
+	_index = std::make_unique<Index>(_saves);
 
     std::cout << "Monitor initialized: " << _saves << "#\n#" << _backup << " #\n#" << "index: " << _index->get_index() << "#\n#";
 }
