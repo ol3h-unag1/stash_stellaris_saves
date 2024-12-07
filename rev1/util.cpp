@@ -35,17 +35,20 @@ fs::path v1::get_current_username() {
     return "";
 }
 
-std::vector<fs::path> get_subdirectories(const fs::path& dir) {
+std::vector<fs::path> v1::get_flat_subdirectories(const fs::path& dir) {
 
     std::vector<fs::path> subdirectories;
     // Use directory_iterator for non-recursive traversal
-    for (const auto& entry : fs::directory_iterator(dir)) {
-        if (entry.is_directory()) { // Check if the entry is a directory
+    for (const auto& entry : fs::directory_iterator(dir)) 
+    {
+        if (entry.is_directory()) 
+        { // Check if the entry is a directory
             subdirectories.push_back(entry.path());
         }
     }
     
     return subdirectories;
 }
+
 
 } // end namespace StashSaves::Util

@@ -20,6 +20,9 @@ bool is_directory_exists(const std::string& path);
 
 fs::path get_current_username();
 
+std::vector<fs::path> get_flat_subdirectories(const fs::path& dir);
+
+
 } // end namespace StashSaves::Util::v1
 
 namespace v2

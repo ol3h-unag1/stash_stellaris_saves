@@ -8,7 +8,7 @@ inline namespace v1
 {
 
 
-class Index;
+//class Index;
 
 namespace fs = std::filesystem;
 
@@ -27,9 +27,6 @@ private:
 private:
 	fs::path _saves;
 	fs::path _backup;
-
-	std::unique_ptr<Index> _index;
-
 };
 
 

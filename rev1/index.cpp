@@ -14,9 +14,10 @@ namespace StashSaves::Component
 
 	v1::Index::Index(fs::path dir_to_watch) {
 
+		std::cout << "Index is spawning in: " << dir_to_watch << std::endl;
 		try
 		{
-			//watch_dir(dir_to_watch);
+			watch_dir(dir_to_watch);
 		}
 		catch (std::exception& e)
 		{
@@ -86,8 +87,6 @@ namespace StashSaves::Component
 	    inotify_rm_watch(inotify_fd, watch_descriptor);
 	    close(inotify_fd);
 	}
-
-	Int v1::Index::get_index() const { return 1231; }
 
 
 } // end of namespace StashSaves::Component
