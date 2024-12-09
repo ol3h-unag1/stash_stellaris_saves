@@ -77,10 +77,8 @@ void v1::Monitor::init() {
     std::cout << "Monitor initialized: " << _saves << "#\n#" << _backup << " #\n";
     for (auto&& empires_save : Util::get_flat_subdirectories(_saves))
     {
-    	auto index = std::make_unique<Index>(empires_save);
+    	_indexes.emplace_back(std::make_unique<Index>(empires_save));
     }
-
-
 }
 
 void v1::Monitor::start() {

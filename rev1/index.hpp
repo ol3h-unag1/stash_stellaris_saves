@@ -14,10 +14,16 @@ inline namespace v1
 	class Index
 	{
 	public:
-		Index(fs::path dir_to_watch);
+		explicit Index(fs::path dir_to_watch);
+
+	public:
+		void watch();
 
 	private:
-		void watch_dir(fs::path);
+		void watch_dir();
+
+	private:
+		fs::path _directory;
 	};
 
 

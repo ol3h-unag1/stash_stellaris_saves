@@ -1,6 +1,7 @@
 #pragma once
 #include <filesystem>
 #include <memory>
+#include <vector>
 
 namespace StashSaves::Component
 {
@@ -8,7 +9,7 @@ inline namespace v1
 {
 
 
-//class Index;
+class Index;
 
 namespace fs = std::filesystem;
 
@@ -27,6 +28,8 @@ private:
 private:
 	fs::path _saves;
 	fs::path _backup;
+
+	std::vector<std::unique_ptr<Index>> _indexes;
 };
 
 

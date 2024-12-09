@@ -12,23 +12,13 @@
 namespace StashSaves::Component
 {
 
-	v1::Index::Index(fs::path dir_to_watch) {
-
-		std::cout << "Index is spawning in: " << dir_to_watch << std::endl;
-		try
-		{
-			watch_dir(dir_to_watch);
-		}
-		catch (std::exception& e)
-		{
-			std::cout << "Index::Index Error in watch_dir method: " << e.what() << std::endl;
-			throw;
-		}
+	v1::Index::Index(fs::path dir_to_watch) 
+		: _directory(std::move(dir_to_watch)){
 	
 	}
 
 	// inotify implementation
-	void v1::Index::watch_dir(fs::path directory) {
+	void v1::Index::watch_dir() {
 
 	    // Initialize inotify
 	    int inotify_fd = inotify_init();
@@ -37,7 +27,7 @@ namespace StashSaves::Component
 	    }
 
 	    // Add a watch for the specified directory
-	    int watch_descriptor = inotify_add_watch(inotify_fd, directory.string().c_str(),
+	    int watch_descriptor = inotify_add_watch(inotify_fd, _directory.string().c_str(),
 	                                             IN_CREATE | IN_DELETE | IN_MODIFY);
 	    if (watch_descriptor == -1) {
 	        close(inotify_fd);
@@ -47,7 +37,7 @@ namespace StashSaves::Component
 	    const size_t buffer_size = 1024 * (sizeof(inotify_event) + 16);
 	    std::vector<char> buffer(buffer_size);
 
-	    std::cout << "Monitoring directory: " << directory << '\n';
+	    std::cout << "Monitoring directory: " << _directory << '\n';
 
 	    try {
 	        while (true) {
