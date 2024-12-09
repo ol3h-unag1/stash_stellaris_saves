@@ -9,8 +9,9 @@ namespace StashSaves::Component
 {
 
 //const char* G_game_path = ".local/share/Paradox Interactive/Stellaris/save games/"; // real dir
-const char* G_game_path = "Stellaris/Saves/rev1/"; // test dir
+const char* G_game_path = "Stellaris/Saves/rev1/"; // mock dir
 const char* G_user_backup_path = "stash_saver/Stellaris/save games/";
+const char* G_socket_temp_path = "stash_saver/Stellaris/.sockets/";
 
 auto base_path(auto&& user_name, auto&& local_game_saves_path) {
 
@@ -72,12 +73,16 @@ void v1::Monitor::init() {
 	    std::cout << "Backup directory has been created: " << _backup << std::endl;;
 	}
 	
-	//_index = std::make_unique<Index>(_saves);
-
     std::cout << "Monitor initialized: " << _saves << "#\n#" << _backup << " #\n";
     for (auto&& empires_save : Util::get_flat_subdirectories(_saves))
     {
-    	_indexes.emplace_back(std::make_unique<Index>(empires_save));
+    	std::cout << empires_save << std::endl;
+    	_indexes.emplace_back(std::make_unique<Index>(empires_save, base_path(current_user, G_socket_temp_path)));
+    }
+
+    for (auto&& index : _indexes)
+    {
+    	index->watch_dir();
     }
 }
 

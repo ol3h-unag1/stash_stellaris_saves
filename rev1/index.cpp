@@ -12,13 +12,31 @@
 namespace StashSaves::Component
 {
 
-	v1::Index::Index(fs::path dir_to_watch) 
-		: _directory(std::move(dir_to_watch)){
+	v1::Index::Index(fs::path dir_to_watch, std::string socket) 
+		: _directory(std::move(dir_to_watch))
+		, _socket(std::move(socket)) {
 	
 	}
 
-	// inotify implementation
 	void v1::Index::watch_dir() {
+
+		try 
+		{
+			watch_dir_impl();
+		}
+		catch(std::exception& e)
+		{
+			std::cout << "Index::watch_dir_impl Error: " << e.what() << std::endl;
+		}
+		catch(...)
+		{
+			throw;
+		}
+
+	}
+
+	// inotify implementation
+	void v1::Index::watch_dir_impl() {
 
 	    // Initialize inotify
 	    int inotify_fd = inotify_init();

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <filesystem>
+#include <string>
+
 #include "util.hpp"
 
 namespace StashSaves::Component
@@ -14,16 +16,17 @@ inline namespace v1
 	class Index
 	{
 	public:
-		explicit Index(fs::path dir_to_watch);
+		explicit Index(fs::path dir_to_watch, std::string socket);
 
 	public:
-		void watch();
-
-	private:
 		void watch_dir();
 
 	private:
+		void watch_dir_impl();
+
+	private:
 		fs::path _directory;
+		std::string _socket;
 	};
 
 
