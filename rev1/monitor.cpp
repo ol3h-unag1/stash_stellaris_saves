@@ -9,13 +9,13 @@ namespace StashSaves::Component
 {
 
 //const char* G_game_path = ".local/share/Paradox Interactive/Stellaris/save games/"; // real dir
-const char* G_game_path = "Stellaris/Saves/rev1/"; // mock dir
-const char* G_user_backup_path = "stash_saver/Stellaris/save games/";
-const char* G_socket_temp_path = "stash_saver/Stellaris/.sockets/";
+const char* G_game_path = "Stellaris/Saves/rev1"; // mock dir
+const char* G_user_backup_path = "stash_saver/Stellaris/save games";
+const char* G_socket_temp_path = "stash_saver/Stellaris/.sockets";
 
-auto base_path(auto&& user_name, auto&& local_game_saves_path) {
+auto base_path(auto&& user_name, auto&& path) {
 
-    fs::path base_path = "/home" / user_name / local_game_saves_path;
+    fs::path base_path = "/home" / user_name / path; // NRVO? Maybe. Maybe not. Probably.
     return base_path;
 }
 
@@ -36,6 +36,8 @@ v1::Monitor::Monitor() {
 
 void v1::Monitor::init() {
 
+
+	std::cout << G_socket_temp_path << std::endl;
 		// get game saves directory
 			// get user directory
 		    // checko for stellaris saves dir in it
@@ -73,11 +75,13 @@ void v1::Monitor::init() {
 	    std::cout << "Backup directory has been created: " << _backup << std::endl;;
 	}
 	
-    std::cout << "Monitor initialized: " << _saves << "#\n#" << _backup << " #\n";
+    std::cout << "Monitor initialized: " << _saves << " " << _backup << std::endl;
     for (auto&& empires_save : Util::get_flat_subdirectories(_saves))
     {
-    	std::cout << empires_save << std::endl;
-    	_indexes.emplace_back(std::make_unique<Index>(empires_save, base_path(current_user, G_socket_temp_path)));
+    	auto empire_name_socket = empires_save.filename().replace_extension(".sock");
+    	auto socket = base_path(current_user, G_socket_temp_path) / empire_name_socket;
+    	std::cout << empires_save << " | socket: " << socket << std::endl;
+    	_indexes.emplace_back(std::make_unique<Index>(empires_save, socket));
     }
 
     for (auto&& index : _indexes)
