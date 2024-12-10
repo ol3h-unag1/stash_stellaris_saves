@@ -93,6 +93,10 @@ void v1::Monitor::init() {
 void v1::Monitor::start() {
 
     std::cout << "Monitor started." << std::endl;
+    while(true)
+    {
+    	sleep(1);
+    }
 }
 
 

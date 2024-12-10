@@ -5,6 +5,8 @@
 #include <filesystem>
 #include <sys/inotify.h>
 #include <unistd.h>
+#include <unistd.h>   // For fork(), _exit(), and close()
+#include <signal.h>   // For kill() to terminate processes
 #include <cstring>
 
 #include "index.hpp"
@@ -14,25 +16,44 @@ namespace StashSaves::Component
 
 	v1::Index::Index(fs::path dir_to_watch, std::string socket) 
 		: _directory(std::move(dir_to_watch))
-		, _socket(std::move(socket)) {
+		, _socket(std::move(socket))
+		, _child_pid(-1) {
 	
 	}
 
+    v1::Index::~Index() {
+
+        if (_child_pid > 0) {
+            std::cout << "Terminating child process with PID: " << _child_pid << std::endl;
+            if (kill(_child_pid, SIGTERM) == -1) {
+                std::cerr << "Failed to terminate child process" << std::endl;
+            }
+        }
+    }
+
 	void v1::Index::watch_dir() {
 
-		try 
-		{
-			watch_dir_impl();
-		}
-		catch(std::exception& e)
-		{
-			std::cout << "Index::watch_dir_impl Error: " << e.what() << std::endl;
-		}
-		catch(...)
-		{
-			throw;
-		}
+	    _child_pid = fork();
 
+	    if (_child_pid < 0) {
+	        throw std::runtime_error("Fork failed");
+	    }
+
+	    if (_child_pid == 0) { // Child process
+	        try {
+	            watch_dir_impl(); // Call the implementation
+	            _exit(0);         // Exit successfully
+	        } catch (const std::exception& e) {
+	            std::cerr << "Child process exception: " << e.what() << std::endl;
+	            _exit(1); // Exit with error
+	        }
+	    } else { // Parent process
+	        try {
+	            std::cout << "Forked child process with PID: " << _child_pid << std::endl;
+	        } catch (std::exception& e) {
+	            std::cout << "Index::watch_dir_impl Error: " << e.what() << std::endl;
+	        }
+	    }
 	}
 
 	// inotify implementation

@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <string>
+#include <sys/types.h> 
 
 #include "util.hpp"
 
@@ -13,10 +14,11 @@ inline namespace v1
 	namespace fs = std::filesystem;
 	using Int = StashSaves::Util::Int;
 
-	class Index
+	class Index final
 	{
 	public:
 		explicit Index(fs::path dir_to_watch, std::string socket);
+		~Index();
 
 	public:
 		void watch_dir();
@@ -27,6 +29,7 @@ inline namespace v1
 	private:
 		fs::path _directory;
 		std::string _socket;
+		pid_t _child_pid;  
 	};
 
 
