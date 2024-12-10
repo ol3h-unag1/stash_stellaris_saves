@@ -1,1 +1,1 @@
-Shadow copy move/save games and cloud backup/restore after.
+Shadow copy/move save games files and cloud backup/restore them after.
