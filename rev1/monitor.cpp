@@ -1,4 +1,5 @@
 #include <iostream>
+#include <format>
 #include <exception>
 
 #include "monitor.hpp"
@@ -56,7 +57,7 @@ void v1::Monitor::init() {
 
 	if (not Util::is_directory_exists(_saves))
 	{
-	    throw std::runtime_error("Game saves directory does not exist: " + _saves.string());
+	    throw std::runtime_error(std::format("base_path({}, {}) ==> _saves '{}' doesn't exist", current_user.string(), G_game_path, _saves.string()));
 	}
 
 	if (Util::is_directory_exists(_backup))
