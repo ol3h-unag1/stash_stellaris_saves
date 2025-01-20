@@ -1,17 +1,15 @@
-#!/bin/bash
+# Get the current date in YYYY-MM-DD format
+current_date=$(date +%F)
 
-echo "Today: "
-# Get the current date in the format YYYY-MM-DD
-current_date=$(date +"%Y-%m-%d")
+# Get the number of lines added to the repository today
+lines_added=$(git log --since="$current_date 00:00" --until="$current_date 23:59" --pretty=tformat: --numstat | awk '{added += $1} END {print added}')
+clear
+echo "Number of lines pushed to the repository today: $lines_added"
 
-# Find all commits from today and calculate added and deleted lines
-git log --since="$current_date 00:00" --until="$current_date 23:59" --pretty=tformat: --numstat |
-awk '{added+=$1; deleted+=$2} END {print "Lines added: " added "\nLines deleted: " deleted "\nTotal changes: " added + deleted}'
+# Get the date for yesterday in YYYY-MM-DD format
+#yesterday_date=$(date -d "yesterday" +%F)
 
-echo "Yesterday: "
-# Get yesterday's date in the format YYYY-MM-DD
-yesterday_date=$(date -d "yesterday" +"%Y-%m-%d")
+# Get the number of lines added to the repository yesterday
+#lines_added_yesterday=$(git log --since="$yesterday_date 00:00" --until="$yesterday_date 23:59" --pretty=tformat: --numstat | awk '{added += $1} END {print added}')
 
-# Find all commits from yesterday and calculate added and deleted lines
-git log --since="$yesterday_date 00:00" --until="$yesterday_date 23:59" --pretty=tformat: --numstat |
-awk '{added+=$1; deleted+=$2} END {print "Lines added: " added "\nLines deleted: " deleted "\nTotal changes: " added + deleted}'
+#echo "Number of lines pushed to the repository yesterday: $lines_added_yesterday"
