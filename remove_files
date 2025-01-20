@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Read the file containing the list of files to remove
+while IFS= read -r file_path; do
+    # Remove any leading/trailing whitespace
+    file_path=$(echo "$file_path" | xargs)
+    if [ -e "$file_path" ]; then
+        rm "$file_path"
+        echo "Removed: $file_path"
+    else
+        echo "File not found: $file_path"
+    fi
+done < files_to_remove
