@@ -37,7 +37,10 @@ v1::Monitor::Monitor() {
 void v1::Monitor::init() {
 
 
-	std::cout << G_socket_temp_path << std::endl;
+	std::cout << "Monitor::init() - Socket temporary path: " << G_socket_temp_path << std::endl;
+	std::cout << "Monitor::init() - Game saves path: " << G_game_path << std::endl;
+	std::cout << "Monitor::init() - User backup path: " << G_user_backup_path << std::endl;
+	
 		// get game saves directory
 			// get user directory
 		    // checko for stellaris saves dir in it
