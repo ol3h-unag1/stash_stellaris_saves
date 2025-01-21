@@ -14,8 +14,6 @@ inline namespace v1
 
 namespace fs = std::filesystem;
 
-Tuple3Str generate_paths();
-
 bool is_directory_exists(const std::string& path);
 
 fs::path get_current_username();

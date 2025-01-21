@@ -11,11 +11,6 @@ namespace StashSaves::Util
 {
 
 
-Tuple3Str v1::generate_paths()  {
-
-    return std::make_tuple("Alice", "Bob", "Charlie");
-}
-
 bool v1::is_directory_exists(const std::string& path) {
 
     return fs::exists(path) && fs::is_directory(path);
