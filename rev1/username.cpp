@@ -1,34 +1,50 @@
 #include <iostream>
-#include <filesystem>
-#include <vector>
+#include <fstream>
 #include <string>
+#include <cstdlib>
 
-namespace fs = std::filesystem;
+std::string getMountedFilesystemPath() {
+    std::ifstream wslConf("/etc/wsl.conf");
+    std::string line;
+    std::string path;
 
-std::vector<fs::path> get_human_users(const fs::path& mount_path) {
-    std::vector<fs::path> users;
-    fs::path users_path = mount_path / "c/Users";
-
-    for (const auto& entry : fs::directory_iterator(users_path)) {
-        if (entry.is_directory()) {
-            fs::path user_name = entry.path().filename();
-            if (user_name != "Default" && user_name != "Public" && user_name != "All Users" && user_name != "Default User" && user_name.string().find("defaultuser") != 0) {
-                users.push_back(user_name);
+    if (wslConf.is_open()) {
+        while (std::getline(wslConf, line)) {
+            if (line.find("root") != std::string::npos) {
+                path = line.substr(line.find('=') + 1);
+                break;
             }
         }
+        wslConf.close();
     }
+    return path;
+}
 
-    return users;
+std::string getCurrentUserName() {
+    char buffer[128];
+    std::string result = "";
+    FILE* pipe = popen("/mnt/host/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -Command \"[System.Security.Principal.WindowsIdentity]::GetCurrent().Name\"", "r");
+    if (!pipe) throw std::runtime_error("popen() failed!");
+    try {
+        while (fgets(buffer, sizeof buffer, pipe) != nullptr) {
+            result += buffer;
+        }
+    } catch (...) {
+        pclose(pipe);
+        throw;
+    }
+    pclose(pipe);
+    // Remove any trailing newline characters
+    result.erase(result.find_last_not_of(" \n\r\t") + 1);
+    return result;
 }
 
 int main() {
-    fs::path mount_path = "/mnt/host"; // Adjust this path as necessary
-    std::vector<fs::path> users = get_human_users(mount_path);
+    std::string path = getMountedFilesystemPath();
+    std::string userName = getCurrentUserName();
 
-    std::cout << "Human users in c/Users:" << std::endl;
-    for (const auto& user : users) {
-        std::cout << user.string() << std::endl;
-    }
+    std::cout << "Mounted Filesystem Path: " << path << std::endl;
+    std::cout << "Current User Name: " << userName << std::endl;
 
     return 0;
 }
