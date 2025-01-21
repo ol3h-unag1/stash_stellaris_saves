@@ -2,6 +2,8 @@
 #include <format>        // std::format
 #include <filesystem>    // std::filesystem::exists, std::filesystem::is_directory, std::filesystem::directory_iterator
 #include <vector>        // std::vector
+#include <algorithm>     // std::transform, std::find
+#include <cctype>        // std::toupper
 
 #include <cstdlib>       // getenv
 #include <unistd.h>      // getuid
@@ -46,16 +48,57 @@ fs::path get_current_username() {
         return "";
     }
 #elif __linux__
+
+    // clues for if we working under WSL 
+    std::vector<std::string> clues_words = {"MICROSOFT", "WSL"};
+
     // Check for WSL by reading /proc/version
     std::ifstream proc_version("/proc/version");
-    std::string line;
+    std::string proc_line_content;
     if (proc_version.is_open()) {
-        std::getline(proc_version, line);
+        std::getline(proc_version, proc_line_content);
+        
+        std::transform(proc_line_content.begin(), proc_line_content.end(), proc_line_content.begin(), [](auto const& symbol) { 
+            return std::toupper(symbol);
+        });
+
 #ifdef DEBUG_GET_CURRENT_USERNAME
-        std::cout << std::format("Line {}: /proc/version content: {}\n", __LINE__, line);
+        std::cout << std::format("Line {}: /proc/version content: {}\n", __LINE__, proc_line_content);
 #endif
         proc_version.close();
-        if (line.find("Microsoft") != std::string::npos) {
+
+        std::vector<std::string> words;
+        std::string word;
+        for (char c : proc_line_content) {
+            if (std::isalpha(c)) {
+                word += c;
+            } else if (!word.empty()) {
+                words.push_back(word);
+                word.clear();
+            } else {
+
+            }
+        }
+        if (!word.empty()) {
+            words.push_back(word);
+        }
+
+        auto it = std::find_first_of(words.begin(), words.end(), clues_words.begin(), clues_words.end());
+        bool is_microsoft_wsl = (it != words.end());
+
+        std::cout << "Words: ";
+        for (const auto& w : words) {
+            std::cout << w << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "Clues words: ";
+        for (const auto& clue : clues_words) {
+            std::cout << clue << " ";
+        }
+        std::cout << std::endl;
+
+        if (is_microsoft_wsl) {
             // Running under WSL, determine Windows username
             const char* windows_username = getenv("USERPROFILE");
             if (windows_username != nullptr) {
