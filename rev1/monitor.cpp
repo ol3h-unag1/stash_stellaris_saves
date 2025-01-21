@@ -108,6 +108,10 @@ void v1::Monitor::start() {
 
 int main()
 {
+
+std::cout << std::format("Current username: {}", StashSaves::Util::get_current_username().string()) << std::endl;
+
+#ifdef RUN
 try
 {
 	using Monitor = StashSaves::Component::Monitor;
@@ -126,4 +130,7 @@ catch(...)
 {
 	std::cout << "monitor.cpp::main() unknown exception" << std::endl;
 }
+#endif
+
+	return 1;
 }
