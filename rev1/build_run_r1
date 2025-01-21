@@ -1,10 +1,27 @@
+#!/bin/bash
+
 clear
-echo "Creating build directory..."
+
+# Define colors
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+echo -e "${GREEN}"
+echo "========================================="
+echo "          Creating build directory       "
+echo "========================================="
+echo -e "${NC}"
+
 mkdir -p build
 cd build
 rm -f monitor_exe
 
-echo "Compiling and Running..."
+echo -e "${GREEN}"
+echo "========================================="
+echo "         Compiling and Running...        "
+echo "========================================="
+echo -e "${NC}"
+
 g++ -std=c++23 -Ofast -o monitor_exe ../monitor.cpp ../index.cpp ../util.cpp
 
 ./monitor_exe
@@ -12,4 +29,9 @@ g++ -std=c++23 -Ofast -o monitor_exe ../monitor.cpp ../index.cpp ../util.cpp
 cd -
 rm -rf build
 
-echo "Build and Run is Done! Build directory is removed."
+echo -e "${GREEN}"
+echo "========================================="
+echo " Build and Run is Done! Build directory  "
+echo "               is removed.               "
+echo "========================================="
+echo -e "${NC}"
