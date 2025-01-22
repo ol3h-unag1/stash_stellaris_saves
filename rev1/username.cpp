@@ -84,7 +84,7 @@ std::string get_wsl_windows_username() {
         return "";
     }
 
-    char buffer[128];
+    char buffer[128]; // 128 bytes should be enough for username?
     std::string result = "";
     while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
         result += buffer;
@@ -95,32 +95,22 @@ std::string get_wsl_windows_username() {
     // Remove any trailing newline characters
     result.erase(std::remove(result.begin(), result.end(), '\n'), result.end());
 
+    // Check if the result contains any slashes or backslashes
+    size_t pos = result.find_first_of("\\/");
+    if (pos != std::string::npos) {
+        // Convert to Linux path if needed
+        std::replace(result.begin(), result.end(), '\\', '/');
+        // Extract the last piece of the path
+        result = result.substr(result.find_last_of('/') + 1);
+    }
+
     return result;
 }
+
 
 int main() {
     std::string username = get_wsl_windows_username();
     std::cout << "WSL Windows Username:" << username << std::endl;
 
-
-    auto powershell_exe = get_powershell_path(get_host_filesystem_root());
-    if (powershell_exe.empty()) {
-        std::cerr << "Could not find PowerShell executable." << std::endl;
-        return 1;
-    }
-
-    std::string command = powershell_exe + " -Command \"[System.Security.Principal.WindowsIdentity]::GetCurrent() | Format-List *\"";
-    FILE* pipe = popen(command.c_str(), "r");
-    if (!pipe) {
-        std::cerr << "Failed to run PowerShell command." << std::endl;
-        return 1;
-    }
-
-    char buffer[256];
-    while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
-        std::cout << buffer;
-    }
-
-    pclose(pipe);
     return 0;
 }
