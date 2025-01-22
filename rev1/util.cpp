@@ -178,11 +178,16 @@ std::string get_linux_username() {
 
 } // anonymous namespace
 
+// We also, don't do it at home, setting some flags here to control flow
+// That's just so we can move on, and get back to this hell later
 std::string get_current_username_impl() {
 #ifdef _WIN32
+#define STASH_SAVER_PLATFORM_WINNATIVE
     return get_windows_username();
 #elif __linux__
+#define STASH_SAVER_PLATFORM_LINUXNATIVE
     if (is_running_under_wsl()) {
+        #define STASH_SAVER_PLATFORM_WSL
         return get_wsl_windows_username();
     }
     return get_linux_username();
@@ -200,6 +205,64 @@ fs::path get_current_username() {
     
     return current_user;
 }
+
+const char* G_game_path_linux = ".local/share/Paradox Interactive/Stellaris/save games/";
+const char* G_game_path_win = "Documents/Paradox Interactive/Stellaris/save games/";
+const char* G_game_path_mock = "StellarisMockDir/SavesMockDir/"; // mock dir
+
+const char* G_user_backup_path = "stash_saver/Stellaris/save games/";
+const char* G_socket_temp_path = "stash_saver/Stellaris/.sockets/";
+
+auto build_path(auto&& system_root_path, auto&& user_name, auto&& arbitrary_path) {
+
+    fs::path final_path = system_root_path / user_name / arbitrary_path;
+    return final_path;
+}
+
+fs::path get_save_games_path() {
+
+#ifdef STASH_SAVER_PLATFORM_WINNATIVE
+    return build_path("C/Users/", get_current_username(), G_game_path_win);
+#elif defined(STASH_SAVER_PLATFORM_LINUXNATIVE)
+    return build_path("/home", get_current_username(), G_game_path_linux);
+#elif defined(STASH_SAVER_PLATFORM_WSL)
+    return build_path(get_host_filesystem_root(), get_current_username(), G_game_path_win);
+#else
+    return "Uknowwn platform";
+#endif
+
+    return "";
+}
+
+fs::path get_backup_path() {
+
+#ifdef STASH_SAVER_PLATFORM_WINNATIVE
+    return build_path("C/Users/", get_current_username(), G_user_backup_path);
+#elif defined(STASH_SAVER_PLATFORM_LINUXNATIVE)
+    return build_path("/home", get_current_username(), G_user_backup_path);
+#elif defined(STASH_SAVER_PLATFORM_WSL)
+    return build_path(get_host_filesystem_root(), get_current_username(), G_user_backup_path);
+#else
+    return "Uknowwn platform";
+#endif
+
+    return "";
+}
+
+fs::path get_socket_path() {
+#ifdef STASH_SAVER_PLATFORM_WINNATIVE
+    return build_path("C/Users/", get_current_username(), G_socket_temp_path);
+#elif defined(STASH_SAVER_PLATFORM_WSL)
+    return build_path(get_host_filesystem_root(), get_current_username(), G_socket_temp_path);
+#elif defined(STASH_SAVER_PLATFORM_LINUXNATIVE)
+    return build_path("/home", get_current_username(), G_socket_temp_path);
+#else
+    return "Uknowwn platform";
+#endif
+
+    return "";
+}
+
 
 } // end namespace StashSaves::Util::v1
 

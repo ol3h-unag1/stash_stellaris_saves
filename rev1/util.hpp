@@ -18,6 +18,10 @@ bool is_directory_exists(const std::string& path);
 
 fs::path get_current_username();
 
+fs::path get_save_games_path();
+fs::path get_backup_path();
+fs::path get_socket_path();
+
 std::vector<fs::path> get_flat_subdirectories(const fs::path& dir);
 
 

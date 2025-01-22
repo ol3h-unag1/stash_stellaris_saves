@@ -9,17 +9,6 @@
 namespace StashSaves::Component 
 {
 
-//const char* G_game_path = ".local/share/Paradox Interactive/Stellaris/save games/"; // real dir
-const char* G_game_path = "Stellaris/Saves/rev1"; // mock dir
-const char* G_user_backup_path = "stash_saver/Stellaris/save games";
-const char* G_socket_temp_path = "stash_saver/Stellaris/.sockets";
-
-auto base_path(auto&& user_name, auto&& path) {
-
-    fs::path base_path = "/home" / user_name / path; // NRVO? Maybe. Maybe not. Probably.
-    return base_path;
-}
-
 // c-tor definition
 v1::Monitor::Monitor() {
 	
@@ -42,10 +31,9 @@ v1::Monitor::Monitor() {
 
 void v1::Monitor::init() {
 
-
-	// std::cout << "Monitor::init() - Socket temporary path: " << G_socket_temp_path << std::endl;
-	// std::cout << "Monitor::init() - Game saves path: " << G_game_path << std::endl;
-	// std::cout << "Monitor::init() - User backup path: " << G_user_backup_path << std::endl;
+	//std::cout << "Monitor::init() - Socket temporary path: " << G_socket_temp_path << std::endl;
+	//std::cout << "Monitor::init() - Game saves path: " << G_game_path << std::endl;
+	//std::cout << "Monitor::init() - User backup path: " << G_user_backup_path << std::endl;
 	
 		// get game saves directory
 			// get user directory
@@ -57,12 +45,16 @@ void v1::Monitor::init() {
 	    //
 
 	auto const current_user = Util::get_current_username();
-	_saves = base_path(current_user, G_game_path);
-	_backup = base_path(current_user, G_user_backup_path);
+	_saves = Util::get_save_games_path();
+	_backup = Util::get_backup_path();
 
 	if (not Util::is_directory_exists(_saves))
 	{
 		throw std::runtime_error(std::string("Saves directory does not exist: ") + _saves.string());
+	}
+	else
+	{
+		std::cout << std::format("Saves directory is ready: {} at {}:{}", _saves.string(), __func__, __LINE__) << std::endl;
 	}
 
 	if (Util::is_directory_exists(_backup))
@@ -88,11 +80,8 @@ void v1::Monitor::init() {
 		std::cout << std::format("Backup directory has been created: {} at {}:{}", _backup.string(), __func__, __LINE__) << std::endl;
 	}
 	
-	auto socket_base_path = base_path(current_user, G_socket_temp_path);
-
-	std::cout << std::format("Monitor initialized: {} {} at {}:{}", _saves.string(), _backup.string(), __FILE__, __LINE__) << std::endl;
-
-    for (auto&& empires_save : Util::get_flat_subdirectories(_saves))
+	auto socket_base_path = Util::get_socket_path();
+	for (auto&& empires_save : Util::get_flat_subdirectories(_saves))
     {
     	auto empire_name_socket = empires_save.filename().replace_extension(".sock");
     	auto socket = socket_base_path / empire_name_socket;
@@ -107,8 +96,12 @@ void v1::Monitor::init() {
 }
 
 void v1::Monitor::start() {
-
 	std::cout << std::format("Monitor::start() - Monitor started at {}:{}", __func__, __LINE__) << std::endl;
+	while(true)
+	{
+		sleep(3);
+		std::cout << "Monitor::start() wakee wakee! " << std::endl;
+	}
 }
 
 
