@@ -101,5 +101,26 @@ std::string get_wsl_windows_username() {
 int main() {
     std::string username = get_wsl_windows_username();
     std::cout << "WSL Windows Username:" << username << std::endl;
+
+
+    auto powershell_exe = get_powershell_path(get_host_filesystem_root());
+    if (powershell_exe.empty()) {
+        std::cerr << "Could not find PowerShell executable." << std::endl;
+        return 1;
+    }
+
+    std::string command = powershell_exe + " -Command \"[System.Security.Principal.WindowsIdentity]::GetCurrent() | Format-List *\"";
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe) {
+        std::cerr << "Failed to run PowerShell command." << std::endl;
+        return 1;
+    }
+
+    char buffer[256];
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        std::cout << buffer;
+    }
+
+    pclose(pipe);
     return 0;
 }
