@@ -1,9 +1,11 @@
 #include <iostream>
 #include <vector>
+#include <array>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <filesystem>
+#include <algorithm>
 
 namespace fs = std::filesystem;
 
@@ -72,7 +74,28 @@ std::string get_powershell_path(auto const& host_root) {
 std::string get_wsl_windows_username() {
     
     auto powershell_exe = get_powershell_path(get_host_filesystem_root());
-    return powershell_exe;
+    if (powershell_exe.empty()) {
+        return "";
+    }
+
+    std::string command = powershell_exe + " -Command \"[System.Security.Principal.WindowsIdentity]::GetCurrent().Name\"";
+    FILE* pipe = popen(command.c_str(), "r");
+    if (!pipe) {
+        return "";
+    }
+
+    char buffer[128];
+    std::string result = "";
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
+        result += buffer;
+    }
+
+    pclose(pipe);
+
+    // Remove any trailing newline characters
+    result.erase(std::remove(result.begin(), result.end(), '\n'), result.end());
+
+    return result;
 }
 
 int main() {
