@@ -12,9 +12,9 @@ echo "          Creating build directory       "
 echo "========================================="
 echo -e "${NC}"
 
-mkdir -p build
-cd build
-rm -f monitor_exe
+mkdir -p build > /dev/null 2>&1
+cd build > /dev/null 2>&1
+rm -f monitor_exe > /dev/null 2>&1
 
 echo -e "${GREEN}"
 echo "========================================="
@@ -26,8 +26,8 @@ g++ -std=c++23 -Ofast -o monitor_exe ../monitor.cpp ../index.cpp ../util.cpp
 
 ./monitor_exe
 
-cd - > /dev/null
-rm -rf build
+cd - > /dev/null 2>&1
+rm -rf build > /dev/null 2>&1
 
 echo -e "${GREEN}"
 echo "========================================="

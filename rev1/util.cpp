@@ -178,7 +178,7 @@ std::string get_linux_username() {
 
 } // anonymous namespace
 
-fs::path get_current_username() {
+std::string get_current_username_impl() {
 #ifdef _WIN32
     return get_windows_username();
 #elif __linux__
@@ -189,6 +189,16 @@ fs::path get_current_username() {
 #else
     return ""; // Unsupported platform
 #endif
+}
+
+fs::path get_current_username() {
+
+    auto current_user = get_current_username_impl();
+    current_user.erase(std::remove_if(current_user.begin(), current_user.end(), [](char c) {
+        return c == '\\' || c == '/' || c == '\t' || c == '\n' || c == '\r';
+    }), current_user.end());
+    
+    return current_user;
 }
 
 } // end namespace StashSaves::Util::v1

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <format>
 #include <vector>
 #include <exception>
 #include <filesystem>
@@ -24,9 +25,9 @@ namespace StashSaves::Component
     v1::Index::~Index() {
 
         if (_child_pid > 0) {
-            std::cout << "Terminating child process with PID: " << _child_pid << std::endl;
+			std::cout << std::format("Terminating child process with PID: {} in function {} line {}", _child_pid, __func__, __LINE__) << std::endl;
             if (kill(_child_pid, SIGTERM) == -1) {
-                std::cerr << "Failed to terminate child process" << std::endl;
+				std::cerr << std::format("Failed to terminate child process in function {} line {}", __func__, __LINE__) << std::endl;
             }
         }
     }
@@ -36,7 +37,7 @@ namespace StashSaves::Component
 	    _child_pid = fork();
 
 	    if (_child_pid < 0) {
-	        throw std::runtime_error("Fork failed");
+			throw std::runtime_error(std::format("Failed to fork: {} in function {} line {}", std::strerror(errno), __func__, __LINE__));
 	    }
 
 	    if (_child_pid == 0) { // Child process
@@ -44,14 +45,14 @@ namespace StashSaves::Component
 	            watch_dir_impl(); // Call the implementation
 	            _exit(0);         // Exit successfully
 	        } catch (const std::exception& e) {
-	            std::cerr << "Child process exception: " << e.what() << std::endl;
+				std::cerr << std::format("Child process exception: {} in function {} line {}", e.what(), __func__, __LINE__) << std::endl;
 	            _exit(1); // Exit with error
 	        }
 	    } else { // Parent process
 	        try {
-	            std::cout << "Forked child process with PID: " << _child_pid << std::endl;
+				std::cout << std::format("Forked child process with PID: {} in function {} line {}", _child_pid, __func__, __LINE__) << std::endl;
 	        } catch (std::exception& e) {
-	            std::cout << "Index::watch_dir_impl Error: " << e.what() << std::endl;
+				std::cout << std::format("Index::watch_dir_impl Error: {} in function {} line {}", e.what(), __func__, __LINE__) << std::endl;
 	        }
 	    }
 	}
@@ -62,7 +63,7 @@ namespace StashSaves::Component
 	    // Initialize inotify
 	    int inotify_fd = inotify_init();
 	    if (inotify_fd < 0) {
-	        throw std::runtime_error("Failed to initialize inotify: " + std::string(strerror(errno)));
+			throw std::runtime_error(std::format("Failed to initialize inotify: {} in function {} line {}", std::strerror(errno), __func__, __LINE__));
 	    }
 
 	    // Add a watch for the specified directory
@@ -70,19 +71,19 @@ namespace StashSaves::Component
 	                                             IN_CREATE | IN_DELETE | IN_MODIFY);
 	    if (watch_descriptor == -1) {
 	        close(inotify_fd);
-	        throw std::runtime_error("Failed to add inotify watch: " + std::string(strerror(errno)));
+			throw std::runtime_error(std::format("Failed to add inotify watch: {} in function {} line {}", std::strerror(errno), __func__, __LINE__));
 	    }
 
 	    const size_t buffer_size = 1024 * (sizeof(inotify_event) + 16);
 	    std::vector<char> buffer(buffer_size);
 
-	    std::cout << "Monitoring directory: " << _directory << '\n';
+	    std::cout << "Index::watch_dir_impl() Monitoring directory: " << _directory << '\n';
 
 	    try {
 	        while (true) {
 	            int length = read(inotify_fd, buffer.data(), buffer.size());
 	            if (length < 0) {
-	                throw std::runtime_error("Error reading inotify events: " + std::string(strerror(errno)));
+					throw std::runtime_error(std::format("Error reading inotify events: {} in function {} line {}", std::strerror(errno), __func__, __LINE__));
 	            }
 
 	            int i = 0;
@@ -91,15 +92,15 @@ namespace StashSaves::Component
 
 	                // Handle different types of events
 	                if (event->mask & IN_CREATE) {
-	                    std::cout << "File created: " << event->name << '\n';
+	                    std::cout << "Index::watch_dir_impl() File created: " << event->name << '\n';
 	                }
 
 	                if (event->mask & IN_DELETE) {
-	                    std::cout << "File deleted: " << event->name << '\n';
+	                    std::cout << "Index::watch_dir_impl() File deleted: " << event->name << '\n';
 	                }
 
 	                if (event->mask & IN_MODIFY) {
-	                    std::cout << "File modified: " << event->name << '\n';
+	                    std::cout << "Index::watch_dir_impl() File modified: " << event->name << '\n';
 	                }
 
 	                i += sizeof(inotify_event) + event->len;
