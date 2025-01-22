@@ -1,0 +1,23 @@
+# Today's stats
+today_date=$(date +%F)
+git_log_output=$(git log --since="$today_date 00:00" --until="$today_date 23:59" --pretty=tformat: --numstat)
+lines_added_today=$(echo "$git_log_output" | awk '{added += $1} END {print added}')
+lines_removed_today=$(echo "$git_log_output" | awk '{removed += $2} END {print removed}')
+lines_changed_today=$(echo "$git_log_output" | awk '{changed += $1 + $2} END {print changed}')
+
+echo "Today's stats:"
+echo "Lines added: $lines_added_today"
+echo "Lines removed: $lines_removed_today"
+echo "Lines changed: $lines_changed_today"
+
+# Yesterday's stats
+yesterday_date=$(date -d @$(( $(date +%s ) - 86400 )) +%Y-%m-%d) # 86400 seconds in a day, don't ask me why, just don't, I don't know
+git_log_output=$(git log --since="$yesterday_date 00:00" --until="$yesterday_date 23:59" --pretty=tformat: --numstat)
+lines_added_yesterday=$(echo "$git_log_output" | awk '{added += $1} END {print added}')
+lines_removed_yesterday=$(echo "$git_log_output" | awk '{removed += $2} END {print removed}')
+lines_changed_yesterday=$(echo "$git_log_output" | awk '{changed += $1 + $2} END {print changed}')
+
+echo "Yesterday's stats:"
+echo "Lines added: $lines_added_yesterday"
+echo "Lines removed: $lines_removed_yesterday"
+echo "Lines changed: $lines_changed_yesterday"
