@@ -32,16 +32,16 @@ namespace v1 {
 
 namespace {
 
-#ifdef _WIN32
 std::string get_windows_username() {
+#ifdef UNLEN
     char username[UNLEN + 1];
     DWORD username_len = UNLEN + 1;
     if (GetUserNameA(username, &username_len)) {
         return std::string(username);
     }
+#endif
     return "";
 }
-#elif __linux__
 bool is_running_under_wsl() {
     std::ifstream proc_version("/proc/version");
     std::string proc_line_content;
@@ -174,7 +174,6 @@ std::string get_linux_username() {
     }
     return "";
 }
-#endif
 
 } // anonymous namespace
 
