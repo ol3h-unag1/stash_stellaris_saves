@@ -1,50 +1,82 @@
 #include <iostream>
+#include <vector>
 #include <fstream>
+#include <sstream>
 #include <string>
-#include <cstdlib>
+#include <filesystem>
 
-std::string getMountedFilesystemPath() {
-    std::ifstream wslConf("/etc/wsl.conf");
+namespace fs = std::filesystem;
+
+std::string get_host_filesystem_root() {
+
+    std::string const wsl_conf("/etc/wsl.conf");
+    std::ifstream file(wsl_conf);
+
+    if (!file.is_open())
+        return "";
+    
+    std::string automount_section = "[automount]";
+    std::string root_key = "root";
+
     std::string line;
-    std::string path;
+    bool in_automount_section = false;
 
-    if (wslConf.is_open()) {
-        while (std::getline(wslConf, line)) {
-            if (line.find("root") != std::string::npos) {
-                path = line.substr(line.find('=') + 1);
-                break;
+    while (std::getline(file, line)) {
+        if (line.find(automount_section) != std::string::npos) {
+            in_automount_section = true;
+            continue;
+        }
+
+        if (in_automount_section) {
+            if (line.find('[') != std::string::npos) {
+                break; // End of [automount] section
+            }
+
+            std::istringstream iss(line);
+            std::string key, value;
+            if (std::getline(iss, key, '=') && std::getline(iss, value)) {
+                key.erase(0, key.find_first_not_of(" \t"));
+                key.erase(key.find_last_not_of(" \t") + 1);
+                value.erase(0, value.find_first_not_of(" \t"));
+                value.erase(value.find_last_not_of(" \t") + 1);
+
+                if (key == root_key)
+                    return value;
             }
         }
-        wslConf.close();
     }
-    return path;
+
+    return "";
 }
 
-std::string getCurrentUserName() {
-    char buffer[128];
-    std::string result = "";
-    FILE* pipe = popen("/mnt/host/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -Command \"[System.Security.Principal.WindowsIdentity]::GetCurrent().Name\"", "r");
-    if (!pipe) throw std::runtime_error("popen() failed!");
-    try {
-        while (fgets(buffer, sizeof buffer, pipe) != nullptr) {
-            result += buffer;
-        }
-    } catch (...) {
-        pclose(pipe);
-        throw;
+std::string get_powershell_path(auto const& host_root) {
+
+    std::cout << "Host root:" << host_root << std::endl;
+
+    std::vector<std::string> possible_paths = {
+        host_root + "/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+        host_root + "/c/Windows/sysnative/WindowsPowerShell/v1.0/powershell.exe",
+        host_root + "/c/Windows/System32/WindowsPowerShell/v1.0/pwsh.exe",
+        host_root + "/c/Windows/sysnative/WindowsPowerShell/v1.0/pwsh.exe",
+    };
+    
+    for (auto const& path : possible_paths) {
+        std::cout << "Checking path:" << path << std::endl;
+        if (std::filesystem::exists(path))
+            return path;
     }
-    pclose(pipe);
-    // Remove any trailing newline characters
-    result.erase(result.find_last_not_of(" \n\r\t") + 1);
-    return result;
+
+    return "";
+}
+
+std::string get_wsl_windows_username() {
+    
+    auto powershell_exe = get_powershell_path(get_host_filesystem_root());
+    return powershell_exe;
 }
 
 int main() {
-    std::string path = getMountedFilesystemPath();
-    std::string userName = getCurrentUserName();
-
-    std::cout << "Mounted Filesystem Path: " << path << std::endl;
-    std::cout << "Current User Name: " << userName << std::endl;
-
+    std::string username = get_wsl_windows_username();
+    std::cout << "WSL Windows Username:" << username << std::endl;
     return 0;
 }

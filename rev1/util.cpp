@@ -73,15 +73,8 @@ bool is_running_under_wsl() {
 }
 
 std::string get_wsl_windows_username() {
-    const char* windows_username = getenv("USERPROFILE");
-    if (windows_username != nullptr) {
-        std::string user_profile(windows_username);
-        auto pos = user_profile.find("\\Users\\");
-        if (pos != std::string::npos) {
-            return user_profile.substr(pos + 7, user_profile.find("\\", pos + 7) - (pos + 7));
-        }
-    }
-    return "Unknown_Windows_User";
+
+    return "NOT IMPLEMENTED";
 }
 
 std::string get_linux_username() {
