@@ -21,9 +21,9 @@ echo "         Compiling and Running...        "
 echo "========================================="
 echo -e "${NC}"
 
-g++ -std=c++23 -Ofast -o monitor_exe ../monitor.cpp ../index.cpp ../util.cpp
+g++ -std=c++23 -Ofast -o plat_id_exe ../plat_id.cpp
 
-./monitor_exe
+./plat_id_exe
 
 cd - > /dev/null 2>&1
 rm -rf build > /dev/null 2>&1

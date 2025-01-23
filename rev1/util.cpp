@@ -181,12 +181,9 @@ std::string get_linux_username() {
 // That's just so we can move on, and get back to this hell later
 std::string get_current_username_impl() {
 #ifdef _WIN32
-#define STASH_SAVER_PLATFORM_WINNATIVE
     return get_windows_username();
 #elif __linux__
-#define STASH_SAVER_PLATFORM_LINUXNATIVE
     if (is_running_under_wsl()) {
-        #define STASH_SAVER_PLATFORM_WSL
         return get_wsl_windows_username();
     }
     return get_linux_username();
