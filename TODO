@@ -2,9 +2,11 @@ TODO:
  - finalize paths generation:
     - debuggng and refactoring debug (v)
     - host save games dir (stub and mock saves and empires) (x)
-    - sockets temp (x)
-    - backup (x)
+    - sockets temp (v)
+    - backup (v)
     - platform identity (v), integrating Plad_ID into the system as a component (v)
+
+    -- refactoor decompose and refactor PlatformIdentity with dependencies in mind(x)
 
  - switch to component level and analyze futher work direction
    - possibly sockets
