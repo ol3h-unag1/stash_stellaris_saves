@@ -1,51 +1,13 @@
 #include <iostream>     // std::cout
-#include <string>       // std::string
 #include <fstream>      // std::ifstream
 #include <algorithm>    // std::transform, std::find_first_of
 #include <vector>       // std::vector
 #include <optional>     // std::optional
 #include <cctype>       // std::isalpha
 
+#include "plat_id.hpp"
+
 namespace StashSaves::PlatformIdentity {
-
-    enum class Platform {
-        Android,
-        Emscripten,
-        Fuchsia,
-        Linux,
-        POSIX,
-        Unknown,
-        WSL,
-        WSL2,
-        Windows,
-        macOS,
-        Unsupported
-    };
-
-    std::string enum_to_string(Platform platform) {
-        switch (platform) {
-            case Platform::Android: return "Android";
-            case Platform::Emscripten: return "Emscripten";
-            case Platform::Fuchsia: return "Fuchsia";
-            case Platform::Linux: return "Linux";
-            case Platform::POSIX: return "POSIX";
-            case Platform::Unknown: return "Unknown";
-            case Platform::WSL: return "WSL";
-            case Platform::WSL2: return "WSL2";
-            case Platform::Windows: return "Windows";
-            case Platform::macOS: return "macOS";
-            default: return "Unknown";
-        }
-    }
-}
-
-using namespace StashSaves::PlatformIdentity;
-
-struct PlatformId 
-{
-    Platform platform;
-    std::string name;
-};
 
 namespace details
 {
@@ -81,28 +43,49 @@ bool is_running_under_wsl() {
     return false;
 }
 
+std::string enum_to_string(E_Platform platform) {
+
+    switch (platform) {
+        case E_Platform::Android: return "Android";
+        case E_Platform::Emscripten: return "Emscripten";
+        case E_Platform::Fuchsia: return "Fuchsia";
+        case E_Platform::Linux: return "Linux";
+        case E_Platform::POSIX: return "POSIX";
+        case E_Platform::Unknown: return "Unknown";
+        case E_Platform::WSL: return "WSL";
+        case E_Platform::WSL2: return "WSL2";
+        case E_Platform::Windows: return "Windows";
+        case E_Platform::macOS: return "macOS";
+        default: return "E_Platform::Unknown";
+    }
+
+    return "E_Platform::Unknown Unreachable";
 }
+
+} // namespace StashSaves::PlatformIdentity::details
 
 std::optional<PlatformId> get_platform() { // std::optional
 
 #ifdef _WIN32
-    return PlatformId{Platform::Windows, enum_to_string(Platform::Windows)};
+    return PlatformId{E_Platform::Windows, details::enum_to_string(E_Platform::Windows)};
 #elif __linux__
     if (details::is_running_under_wsl()) {
-        return PlatformId{Platform::WSL, enum_to_string(Platform::WSL)};
+        return PlatformId{E_Platform::WSL, details::enum_to_string(E_Platform::WSL)};
     }
-    return PlatformId{Platform::Linux, enum_to_string(Platform::Linux)};
+    return PlatformId{E_Platform::Linux,  details::enum_to_string(E_Platform::Linux)};
 #else
     return {}; // Unsupported platform
 #endif
 
 }
 
+} // namespace StashSaves::PlatformIdentity
+
 int main() {
 
-    auto platform = get_platform();
+    auto platform = StashSaves::PlatformIdentity::get_platform();
     if (platform) {
-        std::cout << "Running on platform: " << enum_to_string(platform->platform) << std::endl;
+        std::cout << "Running on platform: " << platform->name << std::endl;
     } else {
         std::cout << "Unsupported platform" << std::endl;
     }

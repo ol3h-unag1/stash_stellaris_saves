@@ -4,7 +4,7 @@ TODO:
     - host save games dir (stub and mock saves and empires) (x)
     - sockets temp (x)
     - backup (x)
-    - platform identity 
+    - platform identity (v), integrating Plad_ID into the system as a component (v)
 
  - switch to component level and analyze futher work direction
    - possibly sockets
