@@ -7,6 +7,9 @@ TODO:
     - platform identity (v), integrating Plad_ID into the system as a component (v)
 
     -- refactoor decompose and refactor PlatformIdentity with dependencies in mind(x)
+    {
+       platform identity should have Util with get_some_paths methods
+    }
 
  - switch to component level and analyze futher work direction
    - possibly sockets
