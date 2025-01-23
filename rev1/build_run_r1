@@ -10,9 +10,17 @@ NC='\033[0m' # No Color
 cleanup() {
     echo -e "${GREEN}"
     echo "========================================="
-    echo "          Cleaning up build directory    "
+    echo "         Cleaning up build directory     "
     echo "========================================="
     echo -e "${NC}"
+
+    RED='\033[0;31m'
+    BLUE='\033[0;34m'
+
+    echo -e "${RED}To create a ticket, visit: https://github.com/ol3h-unag1/stash_stellaris_saves/issues/new${NC}"
+
+    echo -e "${BLUE}All opened issues: https://github.com/ol3h-unag1/stash_stellaris_saves/issues/${NC}"
+
     rm -rf build > /dev/null 2>&1
     exit 1
 }
@@ -40,14 +48,10 @@ g++ -std=c++23 -Ofast -o monitor_exe ../monitor.cpp ../index.cpp ../util.cpp ../
 
 ./monitor_exe
 
-cd - > /dev/null 2>&1
-rm -rf build > /dev/null 2>&1
-
 echo -e "${GREEN}"
 echo "========================================="
-echo " Build and Run is Done! Build directory  "
-echo "               is removed.               "
+echo " Build and Run is Done!                  "
 echo "========================================="
 echo -e "${NC}"
 
-#TODO: echo "To create a ticket, visit: https://github.com/ol3h-unag1/stash_stellaris_saves/issues/new"
+cleanup
