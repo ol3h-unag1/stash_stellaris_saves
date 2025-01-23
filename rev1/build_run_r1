@@ -6,6 +6,20 @@ clear
 GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
+# Function to clean up and exit
+cleanup() {
+    echo -e "${GREEN}"
+    echo "========================================="
+    echo "          Cleaning up build directory    "
+    echo "========================================="
+    echo -e "${NC}"
+    rm -rf build > /dev/null 2>&1
+    exit 1
+}
+
+# Trap SIGINT (Ctrl+C) and SIGTSTP (Ctrl+Z) signals
+trap cleanup SIGINT SIGTSTP
+
 echo -e "${GREEN}"
 echo "========================================="
 echo "          Creating build directory       "
@@ -36,5 +50,4 @@ echo "               is removed.               "
 echo "========================================="
 echo -e "${NC}"
 
-
-#TODO: remove the build directory if Ctrl+C is pressed or else signal is received
+#TODO: echo "To create a ticket, visit: https://github.com/ol3h-unag1/stash_stellaris_saves/issues/new"
