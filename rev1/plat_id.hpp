@@ -21,8 +21,8 @@ namespace StashSaves::PlatformIdentity {
     
     struct PlatformId 
     {
-        E_Platform platform;
-        std::string name;
+        E_Platform platform_value;
+        std::string platform_name;
     };
 
     std::optional<PlatformId> get_platform();

@@ -11,26 +11,39 @@ namespace StashSaves::Component
 {
 
 // c-tor definition
-v1::Monitor::Monitor() {
-	
-	std::cout << std::format("Monitor::Monitor() - Constructor Begin") << std::endl;
+v1::Monitor::Monitor()
+try
+	: _platform(std::make_unique<PlatformId>(StashSaves::PlatformIdentity::get_platform().value()))
+{
+	std::cout << std::format("Monitor::Monitor() - Body Begin") << std::endl;
+	init();
+	std::cout << std::format("Monitor::Monitor() - Body End") << std::endl;
+}
+catch(std::exception& e)
+{
+	std::cout << "Monitor::Monitor() - Exception: " <<  e.what() << std::endl;
+}
+catch(...)
+{
+	std::cout << std::format("Monitor::Monitor() - Unknown exception. ") << std::endl;
+}
+
+void v1::Monitor::init()
+{
 	try
 	{
-		init();
-		std::cout << std::format("Monitor::Monitor() - Initialized") << std::endl;
+		init_impl();
 	}
 	catch(std::exception& e)
 	{
-		std::cout << "Monitor::Monitor() - Exception: " <<  e.what() << std::endl;
+		std::cout << "Monitor::init() - Exception: " <<  e.what() << std::endl;
 	}
 	catch(...)
 	{
-		std::cout << std::format("Monitor::Monitor() - Unknown exception") << std::endl;
+		std::cout << std::format("Monitor::init() - Unknown exception. ") << std::endl;
 	}
-	std::cout << std::format("Monitor::Monitor() - Constructor End") << std::endl;
 }
-
-void v1::Monitor::init() {
+void v1::Monitor::init_impl() {
 
 	//std::cout << "Monitor::init() - Socket temporary path: " << G_socket_temp_path << std::endl;
 	//std::cout << "Monitor::init() - Game saves path: " << G_game_path << std::endl;
@@ -45,9 +58,9 @@ void v1::Monitor::init() {
 		// ..
 	    //
 
-	auto const current_user = Util::get_current_username();
-	_saves = Util::get_save_games_path();
-	_backup = Util::get_backup_path();
+	auto const current_user = Util::get_current_username(_platform);
+	_saves = Util::get_save_games_path(_platform);
+	_backup = Util::get_backup_path(_platform);
 
 	if (not Util::is_directory_exists(_saves))
 	{
@@ -81,7 +94,7 @@ void v1::Monitor::init() {
 		std::cout << std::format("Backup directory has been created: {} at {}:{}", _backup.string(), __func__, __LINE__) << std::endl;
 	}
 	
-	auto socket_base_path = Util::get_socket_path();
+	auto socket_base_path = Util::get_socket_path(_platform);
 	for (auto&& empires_save : Util::get_flat_subdirectories(_saves))
     {
     	auto empire_name_socket = empires_save.filename().replace_extension(".sock");

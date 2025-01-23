@@ -17,6 +17,7 @@
 #endif
 
 #include "util.hpp"
+#include "plat_id.hpp"
 
 namespace StashSaves::Util
 {
@@ -179,22 +180,36 @@ std::string get_linux_username() {
 
 // We also, don't do it at home, setting some flags here to control flow
 // That's just so we can move on, and get back to this hell later
-std::string get_current_username_impl() {
-#ifdef _WIN32
-    return get_windows_username();
-#elif __linux__
-    if (is_running_under_wsl()) {
+std::string get_current_username_impl(PlatformIdPtr platform_identity_ptr) {
+    
+    if (not platform_identity_ptr) 
+        return "get_current_username_impl: PlatformIdPtr is nullptr";
+    
+    using StashSaves::PlatformIdentity::E_Platform;
+
+    if (E_Platform::WSL == platform_identity_ptr->platform_value || E_Platform::WSL2 == platform_identity_ptr->platform_value) 
+    {
         return get_wsl_windows_username();
     }
-    return get_linux_username();
-#else
-    return ""; // Unsupported platform
-#endif
+    else if(E_Platform::Windows == platform_identity_ptr->platform_value) 
+    {
+        return get_windows_username();
+    }
+    else if(E_Platform::Linux == platform_identity_ptr->platform_value) 
+    {
+        return get_linux_username();
+    }
+    else
+    {
+        return "get_current_username_impl: Unsupported platform";
+    }
+
+    return "get_current_username_impl: Unreachable";
 }
 
-fs::path get_current_username() {
+fs::path get_current_username(PlatformIdPtr platform_identity_ptr) {
 
-    auto current_user = get_current_username_impl();
+    auto current_user = get_current_username_impl(platform_identity_ptr);
     current_user.erase(std::remove_if(current_user.begin(), current_user.end(), [](char c) {
         return c == '\\' || c == '/' || c == '\t' || c == '\n' || c == '\r';
     }), current_user.end());
@@ -215,50 +230,83 @@ auto build_path(auto&& system_root_path, auto&& user_name, auto&& arbitrary_path
     return final_path;
 }
 
-fs::path get_save_games_path() {
+fs::path get_save_games_path(PlatformIdPtr platform_identity_ptr) {
 
-#ifdef STASH_SAVER_PLATFORM_WINNATIVE
-    return build_path("C/Users/", get_current_username(), G_game_path_win);
-#elif defined(STASH_SAVER_PLATFORM_LINUXNATIVE)
-    return build_path("/home", get_current_username(), G_game_path_linux);
-#elif defined(STASH_SAVER_PLATFORM_WSL)
-    return build_path(get_host_filesystem_root(), get_current_username(), G_game_path_win);
-#else
-    return "Uknowwn platform";
-#endif
+    if (not platform_identity_ptr) 
+        return "get_current_username_impl: PlatformIdPtr is nullptr";
+    
+    using StashSaves::PlatformIdentity::E_Platform;
+    if (E_Platform::WSL == platform_identity_ptr->platform_value || E_Platform::WSL2 == platform_identity_ptr->platform_value) 
+    {
+        return build_path(get_host_filesystem_root(), get_current_username(platform_identity_ptr), G_game_path_win);
+    }
+    else if(E_Platform::Windows == platform_identity_ptr->platform_value) 
+    {
+         return build_path("C/Users/", get_current_username(platform_identity_ptr), G_game_path_win);
+    }
+    else if(E_Platform::Linux == platform_identity_ptr->platform_value) 
+    {
+        return build_path("/home", get_current_username(platform_identity_ptr), G_game_path_linux);
+    }
+    else
+    {
+        return "get_save_games_path: Unsupported platform";
+    }
 
-    return "";
+    return "get_save_games_path: Unreachable";
 }
 
-fs::path get_backup_path() {
+fs::path get_backup_path(PlatformIdPtr platform_identity_ptr) {
 
-#ifdef STASH_SAVER_PLATFORM_WINNATIVE
-    return build_path("C/Users/", get_current_username(), G_user_backup_path);
-#elif defined(STASH_SAVER_PLATFORM_LINUXNATIVE)
-    return build_path("/home", get_current_username(), G_user_backup_path);
-#elif defined(STASH_SAVER_PLATFORM_WSL)
-    return build_path(get_host_filesystem_root(), get_current_username(), G_user_backup_path);
-#else
-    return "Uknowwn platform";
-#endif
+    if (not platform_identity_ptr) 
+        return "get_current_username_impl: PlatformIdPtr is nullptr";
+    
+    using StashSaves::PlatformIdentity::E_Platform;
+    if (E_Platform::WSL == platform_identity_ptr->platform_value || E_Platform::WSL2 == platform_identity_ptr->platform_value) 
+    {
+        return build_path(get_host_filesystem_root(), get_current_username(platform_identity_ptr), G_user_backup_path);
+    }
+    else if(E_Platform::Windows == platform_identity_ptr->platform_value) 
+    {
+        return build_path("C/Users/", get_current_username(platform_identity_ptr), G_user_backup_path);
+    }
+    else if(E_Platform::Linux == platform_identity_ptr->platform_value) 
+    {
+        return build_path("/home", get_current_username(platform_identity_ptr), G_user_backup_path);
+    }
+    else
+    {
+        return "get_backup_path: Unsupported platform";
+    }
 
-    return "";
+    return "get_backup_path: Unreachable";
 }
 
-fs::path get_socket_path() {
-#ifdef STASH_SAVER_PLATFORM_WINNATIVE
-    return build_path("C/Users/", get_current_username(), G_socket_temp_path);
-#elif defined(STASH_SAVER_PLATFORM_WSL)
-    return build_path(get_host_filesystem_root(), get_current_username(), G_socket_temp_path);
-#elif defined(STASH_SAVER_PLATFORM_LINUXNATIVE)
-    return build_path("/home", get_current_username(), G_socket_temp_path);
-#else
-    return "Uknowwn platform";
-#endif
+fs::path get_socket_path(PlatformIdPtr platform_identity_ptr) {
 
-    return "";
+    if (not platform_identity_ptr) 
+        return "get_current_username_impl: PlatformIdPtr is nullptr";
+    
+    using StashSaves::PlatformIdentity::E_Platform;
+    if (E_Platform::WSL == platform_identity_ptr->platform_value || E_Platform::WSL2 == platform_identity_ptr->platform_value) 
+    {
+        return build_path(get_host_filesystem_root(), get_current_username(platform_identity_ptr), G_socket_temp_path);
+    }
+    else if(E_Platform::Windows == platform_identity_ptr->platform_value) 
+    {
+        return build_path("C/Users/", get_current_username(platform_identity_ptr), G_socket_temp_path);
+    }
+    else if(E_Platform::Linux == platform_identity_ptr->platform_value) 
+    {
+        return build_path("/home", get_current_username(platform_identity_ptr), G_socket_temp_path);
+    }
+    else
+    {
+        return "get_socket_path: Unsupported platform";
+    }
+
+    return "get_socket_path: Unreachable";
 }
-
 
 } // end namespace StashSaves::Util::v1
 

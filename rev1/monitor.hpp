@@ -9,6 +9,7 @@ namespace StashSaves::PlatformIdentity
 {
 	struct PlatformId;
 }
+// end of forward declarations of PlatformIdentity types
 
 namespace StashSaves::Component
 {
@@ -26,7 +27,7 @@ namespace fs = std::filesystem;
 class Monitor
 {
 	using PlatformId = StashSaves::PlatformIdentity::PlatformId;
-
+	using PlatformIdPtr = std::shared_ptr<PlatformId>;
 public:
 	Monitor();
 
@@ -35,12 +36,14 @@ public:
 
 private:
 	void init();
+	void init_impl();
 
 private:
 	fs::path _saves;
 	fs::path _backup;
 
-	std::unique_ptr<PlatformId> _platform;
+	PlatformIdPtr _platform;
+
 	std::vector<std::unique_ptr<Index>> _indexes;
 };
 // end of Module Component Monitor
