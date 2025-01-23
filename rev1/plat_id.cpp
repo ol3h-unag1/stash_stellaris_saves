@@ -81,13 +81,12 @@ std::optional<PlatformId> get_platform() { // std::optional
 
 } // namespace StashSaves::PlatformIdentity
 
-int main() {
-
-    auto platform = StashSaves::PlatformIdentity::get_platform();
-    if (platform) {
-        std::cout << "Running on platform: " << platform->name << std::endl;
-    } else {
-        std::cout << "Unsupported platform" << std::endl;
-    }
-    return 0;
-}
+// int main() {
+//     auto platform = StashSaves::PlatformIdentity::get_platform();
+//     if (platform) {
+//         std::cout << "Running on platform: " << platform->name << std::endl;
+//     } else {
+//         std::cout << "Unsupported platform" << std::endl;
+//     }
+//     return 0;
+// }

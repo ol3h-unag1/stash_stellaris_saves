@@ -12,6 +12,7 @@ echo "          Creating build directory       "
 echo "========================================="
 echo -e "${NC}"
 
+rm -rf build > /dev/null 2>&1
 mkdir -p build > /dev/null 2>&1
 cd build > /dev/null 2>&1
 
@@ -21,7 +22,7 @@ echo "         Compiling and Running...        "
 echo "========================================="
 echo -e "${NC}"
 
-g++ -std=c++23 -Ofast -o monitor_exe ../monitor.cpp ../index.cpp ../util.cpp
+g++ -std=c++23 -Ofast -o monitor_exe ../monitor.cpp ../index.cpp ../util.cpp ../plat_id.cpp
 
 ./monitor_exe
 
@@ -34,3 +35,6 @@ echo " Build and Run is Done! Build directory  "
 echo "               is removed.               "
 echo "========================================="
 echo -e "${NC}"
+
+
+#TODO: remove the build directory if Ctrl+C is pressed or else signal is received

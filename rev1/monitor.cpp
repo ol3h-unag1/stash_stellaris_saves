@@ -3,6 +3,7 @@
 #include <exception>
 
 #include "monitor.hpp"
+#include "plat_id.hpp"
 #include "util.hpp"
 #include "index.hpp"
 
