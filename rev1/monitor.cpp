@@ -126,12 +126,6 @@ int main()
 
 #define RUN
 
-
-#ifndef RUN
-std::cout << std::format("Current username: {}", StashSaves::Util::get_current_username().string()) << std::endl;
-#endif
-
-
 #ifdef RUN
 try
 {
@@ -141,6 +135,7 @@ try
 	mon.start();
 
 	std::cout << "monitor::main()" << std::endl;
+
 	return 0;
 }
 catch (std::exception& e)

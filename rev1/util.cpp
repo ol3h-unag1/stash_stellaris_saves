@@ -238,7 +238,7 @@ fs::path get_save_games_path(PlatformIdPtr platform_identity_ptr) {
     using StashSaves::PlatformIdentity::E_Platform;
     if (E_Platform::WSL == platform_identity_ptr->platform_value || E_Platform::WSL2 == platform_identity_ptr->platform_value) 
     {
-        return build_path(get_host_filesystem_root(), get_current_username(platform_identity_ptr), G_game_path_win);
+        return build_path(get_host_filesystem_root() + "/c/Users/", get_current_username(platform_identity_ptr), G_game_path_win);
     }
     else if(E_Platform::Windows == platform_identity_ptr->platform_value) 
     {
@@ -309,7 +309,6 @@ fs::path get_socket_path(PlatformIdPtr platform_identity_ptr) {
 }
 
 } // end namespace StashSaves::Util::v1
-
 
 std::vector<fs::path> v1::get_flat_subdirectories(const fs::path& dir) {
 

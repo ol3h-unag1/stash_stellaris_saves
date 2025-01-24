@@ -45,6 +45,13 @@ private:
 	PlatformIdPtr _platform;
 
 	std::vector<std::unique_ptr<Index>> _indexes;
+
+#define DEBUG_COMPONENT_MONITOR
+#ifdef DEBUG_COMPONENT_MONITOR
+public:
+	auto platform() const { return _platform; }
+
+#endif
 };
 // end of Module Component Monitor
 
