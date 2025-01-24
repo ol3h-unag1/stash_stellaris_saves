@@ -16,4 +16,8 @@ TODO:
 
 TODO:
 - automation of creation of new issues time entries on Toggl (v)
-- automate issue closing time entry on Toggl(if possible), or integrate/migrate to other option of hooks automation (x)
+- automate issue closing time entry on Toggl(if possible), or integrate/migrate to other option of hooks automation (x
+
+ISSUES:
+- [1] Defect Completed (https://github.com/ol3h-unag1/stash_stellaris_saves/issues/1)
+- [2] [Issue Opened](https://github.com/ol3h-unag1/stash_stellaris_saves/issues/2)  
