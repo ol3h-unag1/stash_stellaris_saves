@@ -15,9 +15,13 @@ TODO:
    - possibly sockets
 
 TODO:
-- automation of creation of new issues time entries on Toggl (v)
-- automate issue closing time entry on Toggl(if possible), or integrate/migrate to other option of hooks automation (x
+ - automation of creation of new issues time entries on Toggl (v)
+ - automate issue closing time entry on Toggl(if possible), or integrate/migrate to other option of hooks automation (x
+
+TODO:
+ - consider to use tempalates for versioning instead of namespaces/inline namespaces
 
 ISSUES:
-- [1] Defect Completed (https://github.com/ol3h-unag1/stash_stellaris_saves/issues/1)
-- [2] [Issue Opened](https://github.com/ol3h-unag1/stash_stellaris_saves/issues/2)  
+   - [1] [Defect Completed] (https://github.com/ol3h-unag1/stash_stellaris_saves/issues/1)
+   - [2] [Issue Opened] (https://github.com/ol3h-unag1/stash_stellaris_saves/issues/2)  
+   - [3] [Issue Opened] (https://github.com/ol3h-unag1/stash_stellaris_saves/issues/3)
