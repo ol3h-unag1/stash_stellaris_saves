@@ -24,10 +24,7 @@ public:
     static std::shared_ptr<PlatformIdentity::Access> instance();
 
 public: 
-    void say_hello() const {
 
-        std::cout << "Hello, World! Itsa me, a PlatformIdentio" << std::endl;
-    }
 
 };
 

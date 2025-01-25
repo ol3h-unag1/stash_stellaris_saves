@@ -17,8 +17,6 @@ std::shared_ptr<PlatformIdentity::Access> PlatformIdentity::instance() {
 
 int main()
 {
-    PlatformIdentity::instance()->say_hello();
+    std::cout << PlatformIdentity::instance().use_count() << std::endl;
     return 0;
 }
-
-// compare my approach to using std::enable_shared_from_this (ask chat for halp)
