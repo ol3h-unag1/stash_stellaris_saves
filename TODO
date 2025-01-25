@@ -1,4 +1,4 @@
-TODO:
+DONE:
  - finalize paths generation:
     - debuggng and refactoring debug (v)
     - host save games dir (stub and mock saves and empires) (x)
@@ -14,11 +14,12 @@ TODO:
  - switch to component level and analyze futher work direction
    - possibly sockets
 
-TODO:
+PROCESS MANAGEMENT:
  - automation of creation of new issues time entries on Toggl (v)
- - automate issue closing time entry on Toggl(if possible), or integrate/migrate to other option of hooks automation (x
+ - automate issue closing time entry on Toggl(if possible), or integrate/migrate to other option of hooks automation (postponed)
 
-TODO:
+CODE CHANGES:
+ - decompose Platform Identity & Component Util https://github.com/ol3h-unag1/stash_stellaris_saves/issues/2
  - consider to use tempalates for versioning instead of namespaces/inline namespaces
 
 ISSUES:
