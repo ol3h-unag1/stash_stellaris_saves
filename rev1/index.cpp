@@ -68,7 +68,7 @@ namespace StashSaves::Component
 
 	    // Add a watch for the specified directory
 	    int watch_descriptor = inotify_add_watch(inotify_fd, _directory.string().c_str(),
-	                                             IN_CREATE | IN_DELETE | IN_MODIFY);
+	                                             IN_CREATE | IN_DELETE );
 	    if (watch_descriptor == -1) {
 	        close(inotify_fd);
 			throw std::runtime_error(std::format("Failed to add inotify watch: {} in function {} line {}", std::strerror(errno), __func__, __LINE__));
@@ -90,18 +90,24 @@ namespace StashSaves::Component
 	            while (i < length) {
 	                inotify_event* event = reinterpret_cast<inotify_event*>(&buffer[i]);
 
-	                // Handle different types of events
-	                if (event->mask & IN_CREATE) {
-	                    std::cout << "Index::watch_dir_impl() File created: " << event->name << '\n';
-	                }
+					std::cout << "Index::watch_dir_impl() Event: " << event->wd << " mask: " << event->mask << " cookie: " << event->cookie << " len: " << event->len << '\n';
+	                
+					// Handle different types of events
+	                if (event->mask & IN_CREATE) 
+					{
+	                    std::cout << "Index::watch_dir_impl() File created: " << event->name;
 
-	                if (event->mask & IN_DELETE) {
-	                    std::cout << "Index::watch_dir_impl() File deleted: " << event->name << '\n';
-	                }
+	                } 
+					else if (event->mask & IN_DELETE) 
+					{
+	                    std::cout << "Index::watch_dir_impl() File deleted: " << event->name;
+	                } 
+					else
+					{
+						std::cout << "Unreachable. Unsupported event, wd: " << event->wd << " mask: " << event->mask;
+					}
 
-	                if (event->mask & IN_MODIFY) {
-	                    std::cout << "Index::watch_dir_impl() File modified: " << event->name << '\n';
-	                }
+					std::cout << std::endl; 
 
 	                i += sizeof(inotify_event) + event->len;
 	            }

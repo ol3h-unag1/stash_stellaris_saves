@@ -114,7 +114,6 @@ void v1::Monitor::start() {
 	while(true)
 	{
 		sleep(3);
-		std::cout << "Monitor::start() wakee wakee! " << std::endl;
 	}
 }
 
