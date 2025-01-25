@@ -64,8 +64,7 @@ std::string enum_to_string(E_Platform platform) {
 
 } // namespace StashSaves::PlatformIdentity::details
 
-namespace current_version = StashSaves::PlatformIdentity::v1;
-std::optional<PlatformId> current_version::get_platform() { // std::optional
+std::optional<PlatformId> get_platform() { // std::optional
 
 #ifdef _WIN32
     return PlatformId{E_Platform::Windows, details::enum_to_string(E_Platform::Windows)};
