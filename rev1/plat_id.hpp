@@ -5,6 +5,8 @@
 
 namespace StashSaves::PlatformIdentity {
 
+inline namespace v1 {
+
     enum class E_Platform {
         Android,
         Emscripten,
@@ -26,5 +28,7 @@ namespace StashSaves::PlatformIdentity {
     };
 
     std::optional<PlatformId> get_platform();
+
+} // end of inline namespace StashSaves::PlatformIdentity::v1
 
 } // namespace StashSaves::PlatformIdentity

@@ -13,7 +13,7 @@ namespace StashSaves::Component
 // c-tor definition
 v1::Monitor::Monitor()
 try
-	: _platform(std::make_unique<PlatformId>(StashSaves::PlatformIdentity::get_platform().value()))
+	: _platform(std::make_shared<PlatformId>(StashSaves::PlatformIdentity::get_platform().value()))
 {
 	std::cout << std::format("Monitor::Monitor() - Body Begin") << std::endl;
 	init();
