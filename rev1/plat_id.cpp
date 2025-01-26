@@ -12,6 +12,25 @@ namespace StashSaves::PlatformIdentity {
 namespace details
 {
 
+std::string enum_to_string(E_Platform platform) {
+
+    switch (platform) {
+        case E_Platform::Android: return "Android";
+        case E_Platform::Emscripten: return "Emscripten";
+        case E_Platform::Fuchsia: return "Fuchsia";
+        case E_Platform::Linux: return "Linux";
+        case E_Platform::POSIX: return "POSIX";
+        case E_Platform::Unknown: return "Unknown";
+        case E_Platform::WSL: return "WSL";
+        case E_Platform::WSL2: return "WSL2";
+        case E_Platform::Windows: return "Windows";
+        case E_Platform::macOS: return "macOS";
+        default: return "E_Platform::Unknown";
+    }
+
+    return "E_Platform::Unknown Unreachable";
+}
+
 bool is_running_under_wsl() {
 
     std::ifstream proc_version("/proc/version"); // std::ifstream
@@ -41,25 +60,6 @@ bool is_running_under_wsl() {
         return (it != words.end());
     }
     return false;
-}
-
-std::string enum_to_string(E_Platform platform) {
-
-    switch (platform) {
-        case E_Platform::Android: return "Android";
-        case E_Platform::Emscripten: return "Emscripten";
-        case E_Platform::Fuchsia: return "Fuchsia";
-        case E_Platform::Linux: return "Linux";
-        case E_Platform::POSIX: return "POSIX";
-        case E_Platform::Unknown: return "Unknown";
-        case E_Platform::WSL: return "WSL";
-        case E_Platform::WSL2: return "WSL2";
-        case E_Platform::Windows: return "Windows";
-        case E_Platform::macOS: return "macOS";
-        default: return "E_Platform::Unknown";
-    }
-
-    return "E_Platform::Unknown Unreachable";
 }
 
 } // namespace StashSaves::PlatformIdentity::details
