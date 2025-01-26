@@ -34,8 +34,11 @@ private:
 public:
     static std::shared_ptr<PlatformIdentity::Access> instance();
 
-private:
+#define DEBUG_GET_PLATFORM_ID
+#ifdef DEBUG_GET_PLATFORM_ID
+public:
     auto get_platform_id() const;
+#endif
 
 public:
     fs::path get_current_username() const;

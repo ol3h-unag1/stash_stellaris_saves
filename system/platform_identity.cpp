@@ -44,7 +44,9 @@ bool is_running_under_wsl() {
     return false;
 }
 
-auto get_platform() {
+auto get_platform()
+try
+{
 
 using E_Platform_ID = StashSaves::PlatformIdentity::E_Platform_ID;
 
@@ -59,6 +61,16 @@ using E_Platform_ID = StashSaves::PlatformIdentity::E_Platform_ID;
     return E_Platform_ID::Unsupported; // Unsupported platform
 #endif
 
+}
+catch(std::exception& e)
+{
+    std::cout << "Exception in function " << __func__ << ": " << e.what() << std::endl;
+    return StashSaves::PlatformIdentity::E_Platform_ID::Error;
+}
+catch(...)
+{
+    std::cout << "Unknown exception in function " << __func__ << std::endl;
+    return StashSaves::PlatformIdentity::E_Platform_ID::Error;
 }
 
 std::string to_string(StashSaves::PlatformIdentity::E_Platform_ID id) {
@@ -141,6 +153,9 @@ fs::path PlatformIdentity::get_socket_path() const
 int main()
 {
     using namespace StashSaves;
-    std::cout << PlatformIdentity::instance().use_count() << std::endl;
+    auto plat_id{ PlatformIdentity::instance() };
+
+    std::cout << "Platform ID: " << impl::to_string(plat_id->get_platform_id()) << std::endl;
+
     return 0;
 }
