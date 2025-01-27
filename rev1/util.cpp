@@ -17,7 +17,6 @@
 #endif
 
 #include "util.hpp"
-#include "plat_id.hpp"
 
 namespace StashSaves::Util
 {

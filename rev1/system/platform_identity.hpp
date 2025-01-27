@@ -51,4 +51,10 @@ private:
 
 };
 
+struct PlatformIdentity::Access final : public PlatformIdentity 
+{
+    Access() = default;
+    ~Access() override = default;
+};
+
 } // end of namespace StashSaves 

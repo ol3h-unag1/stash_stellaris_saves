@@ -108,12 +108,6 @@ PlatformIdentity::PlatformIdentity()
     
 }
 
-struct PlatformIdentity::Access final : public PlatformIdentity 
-{
-    Access() = default;
-    ~Access() override = default;
-};
-
 std::shared_ptr<PlatformIdentity::Access> PlatformIdentity::instance() {
 
     static std::shared_ptr<PlatformIdentity::Access> instance{ std::make_shared<PlatformIdentity::Access>() };

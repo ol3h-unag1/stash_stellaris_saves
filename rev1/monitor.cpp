@@ -101,7 +101,7 @@ void v1::Monitor::start() {
 	std::cout << std::format("Monitor::start() - Monitor started at {}:{}", __func__, __LINE__) << std::endl;
 	while(true)
 	{
-		sleep(3);
+		sleep(1);
 	}
 }
 
