@@ -90,24 +90,24 @@ namespace StashSaves::Component
 	            while (i < length) {
 	                inotify_event* event = reinterpret_cast<inotify_event*>(&buffer[i]);
 
-					std::cout << "Index::watch_dir_impl() Event: " << event->wd << " mask: " << event->mask << " cookie: " << event->cookie << " len: " << event->len << '\n';
+					std::cout << "Index::watch_dir_impl() Event: " << event->wd << " mask: " << event->mask 
+						      << " cookie: " << event->cookie << " len: " << event->len << std::endl;
 	                
 					// Handle different types of events
 	                if (event->mask & IN_CREATE) 
 					{
-	                    std::cout << "Index::watch_dir_impl() File created: " << event->name;
-
+	                    std::cout << "Index::watch_dir_impl() File created: " << event->name << std::endl;
+						//throw std::runtime_error("Created");
 	                } 
 					else if (event->mask & IN_DELETE) 
 					{
-	                    std::cout << "Index::watch_dir_impl() File deleted: " << event->name;
+	                    std::cout << "Index::watch_dir_impl() File deleted: " << event->name << std::endl;
+						//throw std::runtime_error("Deleted");
 	                } 
 					else
 					{
-						std::cout << "Unreachable. Unsupported event, wd: " << event->wd << " mask: " << event->mask;
+						std::cout << "Unreachable. Unsupported event, wd: " << event->wd << " mask: " << event->mask << std::endl;
 					}
-
-					std::cout << std::endl; 
 
 	                i += sizeof(inotify_event) + event->len;
 	            }
