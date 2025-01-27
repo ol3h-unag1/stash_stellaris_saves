@@ -1,0 +1,68 @@
+#!/bin/bash
+
+clear
+
+# Define colors
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Function to clean up and exit
+cleanup() {
+    echo -e "${GREEN}"
+    echo "========================================="
+    echo "         Cleaning up build directory     "
+    echo "========================================="
+    echo -e "${NC}"
+
+    echo -e "${RED}To create a ticket, visit: https://github.com/ol3h-unag1/stash_stellaris_saves/issues/new${NC}"
+
+    echo -e "${BLUE}All opened issues: https://github.com/ol3h-unag1/stash_stellaris_saves/issues/${NC}"
+
+    echo "Attempting to remove 'build' directory..."
+    rm -rf build && echo "Successfully removed 'build' directory." || echo "Failed to remove 'build' directory."
+    exit 0
+}
+
+# Trap SIGINT (Ctrl+C) and SIGTSTP (Ctrl+Z) signals
+trap cleanup SIGINT SIGTSTP
+
+echo -e "${GREEN}"
+echo "========================================="
+echo "          Creating build directory       "
+echo "========================================="
+echo -e "${NC}"
+
+rm -rf build > /dev/null 2>&1
+mkdir -p build > /dev/null 2>&1
+cd build > /dev/null 2>&1
+
+echo -e "${GREEN}"
+echo "========================================="
+echo "         Compiling and Running...        "
+echo "========================================="
+echo -e "${NC}"
+
+# Compile
+g++ -std=c++23 -Ofast -o plat_id_exe ../path.cpp ../platform_identity.cpp
+if [ $? -ne 0 ]; then
+    echo "Compilation failed."
+    cleanup
+fi
+
+# Run program
+./plat_id_exe
+if [ $? -ne 0 ]; then
+    echo "Program execution failed."
+    cleanup
+fi
+
+echo -e "${GREEN}"
+echo "========================================="
+echo " Build and Run is Done!                  "
+echo "========================================="
+echo -e "${NC}"
+
+# Explicitly call the cleanup function
+cleanup

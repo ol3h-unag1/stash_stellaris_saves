@@ -6,20 +6,20 @@
 namespace StashSaves
 {
 
+enum class E_Platform_ID
+{
+    Init = 0,
+    Unsupported,
+    Windows,
+    Linux,
+    WSL,
+    Error
+};
+
 namespace fs = std::filesystem;
 class PlatformIdentity 
 {
 public:
-    enum class E_Platform_ID
-    {
-        Init = 0,
-        Unsupported,
-        Windows,
-        Linux,
-        WSL,
-        Error
-    };
-
     PlatformIdentity();
     virtual ~PlatformIdentity() = default;
     

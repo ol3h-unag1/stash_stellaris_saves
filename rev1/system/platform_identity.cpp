@@ -9,6 +9,7 @@
 #include <cctype>     // std::isalpha
 
 #include "platform_identity.hpp"
+#include "path.hpp"
 
 namespace impl
 {
@@ -48,7 +49,7 @@ auto get_platform()
 try
 {
 
-using E_Platform_ID = StashSaves::PlatformIdentity::E_Platform_ID;
+using E_Platform_ID = StashSaves::E_Platform_ID;
 
 #ifdef _WIN32
     return E_Platform_ID::Windows;
@@ -65,17 +66,17 @@ using E_Platform_ID = StashSaves::PlatformIdentity::E_Platform_ID;
 catch(std::exception& e)
 {
     std::cout << "Exception in function " << __func__ << ": " << e.what() << std::endl;
-    return StashSaves::PlatformIdentity::E_Platform_ID::Error;
+    return StashSaves::E_Platform_ID::Error;
 }
 catch(...)
 {
     std::cout << "Unknown exception in function " << __func__ << std::endl;
-    return StashSaves::PlatformIdentity::E_Platform_ID::Error;
+    return StashSaves::E_Platform_ID::Error;
 }
 
-std::string to_string(StashSaves::PlatformIdentity::E_Platform_ID id) {
+std::string to_string(StashSaves::E_Platform_ID id) {
 
-    using E_Platform_ID = StashSaves::PlatformIdentity::E_Platform_ID;
+    using E_Platform_ID = StashSaves::E_Platform_ID;
 
     switch (id)
     {
@@ -119,43 +120,43 @@ std::shared_ptr<PlatformIdentity::Access> PlatformIdentity::instance() {
     return instance;
 }
 
-auto PlatformIdentity::get_platform_id() const
-{
+auto PlatformIdentity::get_platform_id() const {
+
     return _platform_id;
 }
 
-fs::path PlatformIdentity::get_current_username() const
-{
-    // Implementation to get the current username
-    return "get_current_username";
+fs::path PlatformIdentity::get_current_username() const {
+
+    return Path::get_current_username(_platform_id);
 }
 
-fs::path PlatformIdentity::get_save_games_path() const
-{
-    // Implementation to get the save games path
-    return "get_save_games_path";
+fs::path PlatformIdentity::get_save_games_path() const {
+
+    return Path::get_save_games_path(_platform_id);
 }
 
-fs::path PlatformIdentity::get_backup_path() const
-{
-    // Implementation to get the backup path
-    return "get_backup_path";
+fs::path PlatformIdentity::get_backup_path() const {
+
+    return Path::get_backup_path(_platform_id);
 }
 
-fs::path PlatformIdentity::get_socket_path() const
-{
-    // Implementation to get the socket path
-    return "get_socket_path";
+fs::path PlatformIdentity::get_socket_path() const {
+
+    return Path::get_socket_path(_platform_id);
 }
 
 } // end of namespace StashSaves 
 
-int main()
-{
-    using namespace StashSaves;
-    auto plat_id{ PlatformIdentity::instance() };
+// int main()
+// {
+//     using namespace StashSaves;
+//     auto plat_id{ PlatformIdentity::instance() };
 
-    std::cout << "Platform ID: " << impl::to_string(plat_id->get_platform_id()) << std::endl;
+//     std::cout << "Platform ID: " << impl::to_string(plat_id->get_platform_id()) << std::endl;
+//     std::cout << "Current Username: " << plat_id->get_current_username() << std::endl;
+//     std::cout << "Save Games Path: " << plat_id->get_save_games_path() << std::endl;
+//     std::cout << "Backup Path: " << plat_id->get_backup_path() << std::endl;
+//     std::cout << "Socket Path: " << plat_id->get_socket_path() << std::endl;
 
-    return 0;
-}
+//     return 0;
+// }
