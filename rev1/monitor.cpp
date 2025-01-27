@@ -3,9 +3,9 @@
 #include <exception>
 
 #include "monitor.hpp"
-#include "plat_id.hpp"
-#include "util.hpp"
 #include "index.hpp"
+#include "util.hpp"
+#include "system/platform_identity.hpp"
 
 namespace StashSaves::Component 
 {
@@ -13,7 +13,6 @@ namespace StashSaves::Component
 // c-tor definition
 v1::Monitor::Monitor()
 try
-	: _platform(std::make_shared<PlatformId>(StashSaves::PlatformIdentity::get_platform().value()))
 {
 	std::cout << std::format("Monitor::Monitor() - Body Begin") << std::endl;
 	init();
@@ -43,24 +42,13 @@ void v1::Monitor::init()
 		std::cout << std::format("Monitor::init() - Unknown exception. ") << std::endl;
 	}
 }
+
 void v1::Monitor::init_impl() {
 
-	//std::cout << "Monitor::init() - Socket temporary path: " << G_socket_temp_path << std::endl;
-	//std::cout << "Monitor::init() - Game saves path: " << G_game_path << std::endl;
-	//std::cout << "Monitor::init() - User backup path: " << G_user_backup_path << std::endl;
-	
-		// get game saves directory
-			// get user directory
-		    // checko for stellaris saves dir in it
-		// create back up directory
-		// spawn index into Empire's subfolders
-		// back up something that's already over the limit of files
-		// ..
-	    //
-
-	auto const current_user = Util::get_current_username(_platform);
-	_saves = Util::get_save_games_path(_platform);
-	_backup = Util::get_backup_path(_platform);
+	auto plat_id{ StashSaves::PlatformIdentity::instance() };
+	auto const current_user = plat_id->get_current_username();
+	_saves = plat_id->get_save_games_path();
+	_backup = plat_id->get_backup_path();
 
 	if (not Util::is_directory_exists(_saves))
 	{
@@ -94,7 +82,7 @@ void v1::Monitor::init_impl() {
 		std::cout << std::format("Backup directory has been created: {} at {}:{}", _backup.string(), __func__, __LINE__) << std::endl;
 	}
 	
-	auto socket_base_path = Util::get_socket_path(_platform);
+	auto socket_base_path = plat_id->get_socket_path();
 	for (auto&& empires_save : Util::get_flat_subdirectories(_saves))
     {
     	auto empire_name_socket = empires_save.filename().replace_extension(".sock");

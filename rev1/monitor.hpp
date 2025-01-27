@@ -4,17 +4,6 @@
 #include <optional>
 #include <vector>
 
-// Forward declarations of PlatformIdentity types
-namespace StashSaves::PlatformIdentity
-{
-	struct PlatformId;
-}
-
-using PlatformId = StashSaves::PlatformIdentity::PlatformId;
-using PlatformIdPtr = std::shared_ptr<PlatformId>;
-
-// end of forward declarations of PlatformIdentity types
-
 namespace StashSaves::Component
 {
 
@@ -43,8 +32,6 @@ private:
 private:
 	fs::path _saves;
 	fs::path _backup;
-
-	PlatformIdPtr _platform;
 
 	std::vector<std::unique_ptr<Index>> _indexes;
 };
