@@ -10,19 +10,26 @@ std::string to_string(StashSaves::E_Platform_ID id) {
 
     switch (id)
     {
+    case E_Platform_ID::Default:
+        return "E_Platform_ID::Default";
     case E_Platform_ID::Init:
         return "E_Platform_ID::Init";
+
     case E_Platform_ID::Unknown:
         return "E_Platform_ID::Unknown";
+
     case E_Platform_ID::Windows:
         return "E_Platform_ID::Windows";
     case E_Platform_ID::Linux:
         return "E_Platform_ID::Linux";
     case E_Platform_ID::WSL:
         return "E_Platform_ID::WSL";
+        
     case E_Platform_ID::Error:
-        return "E_Platform_ID::Error";
+        return "E_Platform_ID::Error";    
+    case E_Platform_ID::Max:
+        return "E_Platform_ID::Max";
     default:
-        return std::format("{} unsupported E_Platform_ID value: {}", __func__, static_cast<std::underlying_type_t<E_Platform_ID>>(id));
+        return std::format("{} undefined E_Platform_ID value: {}", __func__, static_cast<std::underlying_type_t<E_Platform_ID>>(id));
     }
 }

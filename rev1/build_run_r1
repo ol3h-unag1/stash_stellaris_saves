@@ -44,7 +44,7 @@ echo "         Compiling and Running...        "
 echo "========================================="
 echo -e "${NC}"
 
-g++ -std=c++23 -Ofast -o monitor_exe ../monitor.cpp ../index.cpp ../util.cpp ../system/platform_identity.cpp ../system/path.cpp
+g++ -std=c++23 -Ofast -o monitor_exe ../monitor.cpp ../index.cpp ../util.cpp ../system/platform_identity.cpp ../system/path.cpp ../system/platform_identity_data.cpp
 
 ./monitor_exe
 
