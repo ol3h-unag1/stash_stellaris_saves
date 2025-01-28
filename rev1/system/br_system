@@ -45,7 +45,7 @@ echo "========================================="
 echo -e "${NC}"
 
 # Compile
-g++ -std=c++23 -Ofast -o system_exe ../path.cpp ../platform_identity.cpp ../main.cpp
+g++ -std=c++23 -Ofast -o system_exe ../platform_identity.cpp ../path.cpp  ../platform_identity_data.cpp ../main.cpp
 if [ $? -ne 0 ]; then
     echo "Compilation failed."
     cleanup

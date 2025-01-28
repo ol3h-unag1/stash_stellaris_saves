@@ -7,12 +7,15 @@
 #include <pwd.h>        // getpwuid, struct passwd
 #include <sstream>      // std::istringstream
 #include <string>       // std::string
+#include <format>       // std::format
 #include <unistd.h>     // getuid
 #include <vector>       // std::vector
 
 #ifdef _WIN32
 #include <windows.h>    // GetUserNameA
 #endif
+
+#include "platform_identity_data.hpp"
 
 #include "platform_identity.hpp"
 #include "path.hpp"
@@ -181,7 +184,7 @@ std::string get_current_username_impl(E_Plat_ID const& plat_id) {
     }
     else
     {
-        return "get_current_username_impl: Unsupported platform";
+        return std::format("{}: unsupported platform {}", __func__, to_string(plat_id));
     }
 
     return "get_current_username_impl: Unreachable";

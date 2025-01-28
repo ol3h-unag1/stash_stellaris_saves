@@ -3,20 +3,17 @@
 #include <memory>
 #include <filesystem>
 
+#include "types.hpp"
+
+#define DEBUG_GET_PLATFORM_ID
+
 namespace StashSaves
 {
 
-enum class E_Platform_ID
-{
-    Init = 0,
-    Unsupported,
-    Windows,
-    Linux,
-    WSL,
-    Error
-};
+enum class E_Platform_ID : Types::EnumUnderlyingType;
 
 namespace fs = std::filesystem;
+
 class PlatformIdentity 
 {
 public:
@@ -34,7 +31,6 @@ private:
 public:
     static std::shared_ptr<PlatformIdentity::Access> instance();
 
-#define DEBUG_GET_PLATFORM_ID
 #ifdef DEBUG_GET_PLATFORM_ID
 public:
     auto get_platform_id() const;
@@ -47,8 +43,7 @@ public:
     fs::path get_socket_path() const;
 
 private:
-    E_Platform_ID const _platform_id = E_Platform_ID::Init;
-
+    E_Platform_ID const _platform_id = Types::INITIALIZE_ENUM_VALUE<E_Platform_ID>(); // in case of emergency call 9-1-1
 };
 
 struct PlatformIdentity::Access final : public PlatformIdentity 

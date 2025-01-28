@@ -8,6 +8,8 @@
 #include <algorithm>  // std::transform, std::find_first_of
 #include <cctype>     // std::isalpha
 
+#include "platform_identity_data.hpp"
+
 #include "platform_identity.hpp"
 #include "path.hpp"
 
@@ -59,9 +61,10 @@ using E_Platform_ID = StashSaves::E_Platform_ID;
     }
     return E_Platform_ID::Linux;
 #else
-    return E_Platform_ID::Unsupported; // Unsupported platform
+    return E_Platform_ID::Unknown; // Unsupported platform
 #endif
 
+    return E_Platform_ID::Error; // Unreachable
 }
 catch(std::exception& e)
 {
@@ -74,28 +77,6 @@ catch(...)
     return StashSaves::E_Platform_ID::Error;
 }
 
-std::string to_string(StashSaves::E_Platform_ID id) {
-
-    using E_Platform_ID = StashSaves::E_Platform_ID;
-
-    switch (id)
-    {
-    case E_Platform_ID::Init:
-        return "E_Platform_ID::Init";
-    case E_Platform_ID::Unsupported:
-        return "E_Platform_ID::Unsupported";
-    case E_Platform_ID::Windows:
-        return "E_Platform_ID::Windows";
-    case E_Platform_ID::Linux:
-        return "E_Platform_ID::Linux";
-    case E_Platform_ID::WSL:
-        return "E_Platform_ID::WSL";
-    case E_Platform_ID::Error:
-        return "E_Platform_ID::Error";
-    default:
-        return std::format("{} Unknown E_Platform_ID value: {}", __func__, static_cast<std::underlying_type_t<E_Platform_ID>>(id));
-    }
-}
 
 } // end of impl namespace
 
@@ -104,8 +85,12 @@ namespace StashSaves
 {
 
 PlatformIdentity::PlatformIdentity() 
-    : _platform_id{ impl::get_platform() } {
-    
+    : _platform_id(impl::get_platform()){
+
+#ifdef DEBUG_GET_PLATFORM_ID
+    std::cout << std::format("{}: init block platform_id: {}", "PlatformIdentity::PlatformIdentity()", to_string(_platform_id)) << std::endl;
+    std::cout << std::format("{}: body block platform_id: {}", "PlatformIdentity::PlatformIdentity()", to_string(impl::get_platform())) << std::endl;
+#endif
 }
 
 std::shared_ptr<PlatformIdentity::Access> PlatformIdentity::instance() {
@@ -114,10 +99,13 @@ std::shared_ptr<PlatformIdentity::Access> PlatformIdentity::instance() {
     return instance;
 }
 
+#define DEBUG_GET_PLATFORM_ID_
+#ifdef DEBUG_GET_PLATFORM_ID
 auto PlatformIdentity::get_platform_id() const {
 
     return _platform_id;
 }
+#endif
 
 fs::path PlatformIdentity::get_current_username() const {
 
@@ -146,7 +134,7 @@ fs::path PlatformIdentity::get_socket_path() const {
 //     using namespace StashSaves;
 //     auto plat_id{ PlatformIdentity::instance() };
 
-//     std::cout << "Platform ID: " << impl::to_string(plat_id->get_platform_id()) << std::endl;
+//     std::cout << "Platform ID: " << to_string(plat_id->get_platform_id()) << std::endl;
 //     std::cout << "Current Username: " << plat_id->get_current_username() << std::endl;
 //     std::cout << "Save Games Path: " << plat_id->get_save_games_path() << std::endl;
 //     std::cout << "Backup Path: " << plat_id->get_backup_path() << std::endl;

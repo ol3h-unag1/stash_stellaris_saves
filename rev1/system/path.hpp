@@ -2,7 +2,7 @@
 
 namespace StashSaves
 {
-    enum class E_Platform_ID;
+    enum class E_Platform_ID : Types::EnumUnderlyingType;
 }
 
 namespace StashSaves::Path
