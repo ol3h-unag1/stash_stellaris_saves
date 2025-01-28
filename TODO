@@ -18,9 +18,10 @@ PROCESS MANAGEMENT:
  - automation of creation of new issues time entries on Toggl (v)
  - automate issue closing time entry on Toggl(if possible), or integrate/migrate to other option of hooks automation (postponed)
 
-CODE CHANGES:
+CODE MANAGEMENT:
  - decompose Platform Identity & Component Util https://github.com/ol3h-unag1/stash_stellaris_saves/issues/2
  - consider to use tempalates for versioning instead of namespaces/inline namespaces
+ - add code generation for types like E_Platform_ID: type, type's correct and incorrect states, types to_string function, etc like serialization
 
 ISSUES:
    - [1] [Defect Completed] (https://github.com/ol3h-unag1/stash_stellaris_saves/issues/1)
