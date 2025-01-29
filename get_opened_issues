@@ -1,0 +1,82 @@
+#!/bin/sh
+
+# Colors
+OPEN_COLOR='\033[1;32m'  # Green
+CLOSED_COLOR='\033[1;31m' # Red
+POSTPONED_COLOR='\033[1;33m' # Yellow
+LABEL_COLOR='\033[1;34m' # Blue
+NC='\033[0m' # No Color
+
+# Debugging: Show full API response
+echo "Fetching issues from GitHub..."
+response=$(curl -siv "https://api.github.com/repos/ol3h-unag1/stash_stellaris_saves/issues?state=all" 2>&1)
+
+# Check for basic curl errors
+if [ $? -ne 0 ]; then
+    echo "\n${RED}curl failed with exit code $?${NC}"
+    echo "Raw curl output:"
+    echo "$response"
+    exit 1
+fi
+
+# Extract HTTP status code
+http_code=$(echo "$response" | grep -m1 '^HTTP/' | awk '{print $2}')
+
+# Handle common status codes
+case $http_code in
+    200) ;;
+    404) echo "${RED}Repository not found (404)${NC}"; exit 1 ;;
+    403) echo "${RED}Rate limited or forbidden (403)${NC}"; exit 1 ;;
+    *) echo "${RED}Unexpected HTTP status: $http_code${NC}"; exit 1 ;;
+esac
+
+# Process response body (remove headers)
+body=$(echo "$response" | sed '1,/^\r$/d')
+
+# Check for empty response
+if [ -z "$body" ] || [ "$body" = "[]" ]; then
+    echo "No issues found in the repository"
+    exit 0
+fi
+
+# Debugging: Show raw JSON body
+echo "\nRaw JSON response:"
+echo "$body" | jq . 2>/dev/null || echo "$body"
+
+# Parse and display issues
+echo "\nFormatted issues:"
+echo "$body" | tr -d '\n' | sed -E 's/},{/\n/g; s/^\[//; s/\]$//' | while read -r issue; do
+    # Basic field extraction
+    number=$(echo "$issue" | grep -o '"number":[0-9]*' | cut -d: -f2)
+    state=$(echo "$issue" | grep -o '"state":"[^"]*"' | cut -d\" -f4)
+    title=$(echo "$issue" | grep -o '"title":"[^"]*"' | cut -d\" -f4)
+    
+    # Label extraction
+    labels=$(echo "$issue" | grep -o '"labels":\[.*\]' | \
+        grep -o '"name":"[^"]*"' | \
+        cut -d\" -f4 | \
+        sed "s/^/[${LABEL_COLOR}&${NC}]/g" | \
+        tr '\n' ' ')
+
+    # Status coloring
+    case "$state" in
+        "open") color=$OPEN_COLOR ;;
+        "closed") color=$CLOSED_COLOR ;;
+        *) color=$NC ;;
+    esac
+
+    # Check for postponed label
+    echo "$labels" | grep -qi "postponed" && color=$POSTPONED_COLOR
+
+    # Format output
+    printf "%b#%-5d %-7s %-40s %b%s%b\n" \
+        "$color" \
+        "$number" \
+        "[${state}]" \
+        "$title" \
+        "$LABEL_COLOR" \
+        "$labels" \
+        "$NC"
+done | sort -n
+
+exit 0

@@ -11,8 +11,8 @@ DONE:
        platform identity should have Util with get_some_paths methods
     }
 
- - switch to component level and analyze futher work direction
-   - possibly sockets
+FIRST OF ORDER:
+   - indexes should notify Monitor about files being created or deleted, monitor builds an array of files back up, let's say 10 files a portion, it copy the files and then removes them from original directory.
 
 PROCESS MANAGEMENT:
  - automation of creation of new issues time entries on Toggl (v)

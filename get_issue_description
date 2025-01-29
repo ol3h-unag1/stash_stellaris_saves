@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# Colors
+GREEN='\033[1;32m'
+YELLOW='\033[1;33m'
+RED='\033[1;31m'
+NC='\033[0m' # No Color
+
+# Check if issue number is provided
+if [ -z "$1" ]; then
+    printf "%b\n" "${RED}Error: Please provide an issue number${NC}"
+    printf "Usage: %b\n" "${GREEN}sh get_issue_description [issue_number]${NC}"
+    exit 1
+fi
+
+# Validate input is a number
+if ! echo "$1" | grep -qE '^[0-9]+$'; then
+    printf "%b\n" "${RED}Error: Invalid issue number. Please provide a numeric value${NC}"
+    exit 1
+fi
+
+# API call
+response=$(curl -sf "https://api.github.com/repos/ol3h-unag1/stash_stellaris_saves/issues/$1")
+
+# Check if request succeeded
+if [ $? -ne 0 ]; then
+    printf "%b\n" "${RED}Error: Issue #$1 not found or repository unavailable${NC}"
+    exit 1
+fi
+
+# Check if issue is open
+state=$(echo "$response" | grep '"state":' | sed -n 's/.*"state": "\(.*\)",/\1/p')
+if [ "$state" != "open" ]; then
+    printf "%b\n" "${YELLOW}Note: Issue #$1 is ${state}${NC}"
+    exit 0
+fi
+
+# Extract title and body
+title=$(echo "$response" | grep '"title":' | sed -n 's/.*"title": "\(.*\)",/\1/p')
+body=$(echo "$response" | grep '"body":' | sed -n 's/.*"body": "\(.*\)",/\1/p')
+
+# Handle null body
+if [ "$body" = "null" ]; then
+    body="No description provided"
+fi
+
+# Format output with colors
+printf "%bTitle:%b %s\n" "${GREEN}" "${NC}" "$title"
+printf "%bDescription:%b \n%s\n" "${YELLOW}" "${NC}" "$body" | sed 's/\\n/\n/g; s/\\"/"/g'
+
+exit 0
