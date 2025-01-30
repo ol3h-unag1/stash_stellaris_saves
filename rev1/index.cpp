@@ -25,7 +25,7 @@ namespace StashSaves::Component
     v1::Index::~Index() {
 
         if (_child_pid > 0) {
-			std::cout << std::format("Terminating child process with PID: {} in function {} line {}", _child_pid, __func__, __LINE__) << std::endl;
+			std::cerr << std::format("Terminating child process with PID: {} in function {} line {}", _child_pid, __func__, __LINE__) << std::endl;
             if (kill(_child_pid, SIGTERM) == -1) {
 				std::cerr << std::format("Failed to terminate child process in function {} line {}", __func__, __LINE__) << std::endl;
             }
@@ -50,9 +50,9 @@ namespace StashSaves::Component
 	        }
 	    } else { // Parent process
 	        try {
-				std::cout << std::format("Forked child process with PID: {} in function {} line {}", _child_pid, __func__, __LINE__) << std::endl;
+				std::cerr << std::format("Forked child process with PID: {} in function {} line {}", _child_pid, __func__, __LINE__) << std::endl;
 	        } catch (std::exception& e) {
-				std::cout << std::format("Index::watch_dir_impl Error: {} in function {} line {}", e.what(), __func__, __LINE__) << std::endl;
+				std::cerr << std::format("Index::watch_dir_impl Error: {} in function {} line {}", e.what(), __func__, __LINE__) << std::endl;
 	        }
 	    }
 	}
@@ -77,7 +77,7 @@ namespace StashSaves::Component
 	    const size_t buffer_size = 1024 * (sizeof(inotify_event) + 16);
 	    std::vector<char> buffer(buffer_size);
 
-	    std::cout << "Index::watch_dir_impl() Monitoring directory: " << _directory << '\n';
+	    std::cerr << "Index::watch_dir_impl() Monitoring directory: " << _directory << '\n';
 
 	    try {
 	        while (true) {
@@ -90,23 +90,23 @@ namespace StashSaves::Component
 	            while (i < length) {
 	                inotify_event* event = reinterpret_cast<inotify_event*>(&buffer[i]);
 
-					std::cout << "Index::watch_dir_impl() Event: " << event->wd << " mask: " << event->mask 
+					std::cerr << "Index::watch_dir_impl() Event: " << event->wd << " mask: " << event->mask 
 						      << " cookie: " << event->cookie << " len: " << event->len << std::endl;
 	                
 					// Handle different types of events
 	                if (event->mask & IN_CREATE) 
 					{
-	                    std::cout << "Index::watch_dir_impl() File created: " << event->name << std::endl;
+	                    std::cerr << "Index::watch_dir_impl() File created: " << event->name << std::endl;
 						//throw std::runtime_error("Created");
 	                } 
 					else if (event->mask & IN_DELETE) 
 					{
-	                    std::cout << "Index::watch_dir_impl() File deleted: " << event->name << std::endl;
+	                    std::cerr << "Index::watch_dir_impl() File deleted: " << event->name << std::endl;
 						//throw std::runtime_error("Deleted");
 	                } 
 					else
 					{
-						std::cout << "Unreachable. Unsupported event, wd: " << event->wd << " mask: " << event->mask << std::endl;
+						std::cerr << "Unreachable. Unsupported event, wd: " << event->wd << " mask: " << event->mask << std::endl;
 					}
 
 	                i += sizeof(inotify_event) + event->len;

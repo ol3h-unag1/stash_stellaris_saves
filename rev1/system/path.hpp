@@ -17,4 +17,7 @@ fs::path get_save_games_path(E_Plat_ID const& plat_id);
 fs::path get_backup_path(E_Plat_ID const& plat_id);
 fs::path get_socket_path(E_Plat_ID const& plat_id);
 
-} // end of namespace StashSaves
+fs::path create_directory(fs::path const& dir);
+fs::path create_file(fs::path const& file);
+
+} // end of namespace StashSaves::Path

@@ -5,7 +5,9 @@
 #include "monitor.hpp"
 #include "index.hpp"
 #include "util.hpp"
+
 #include "system/platform_identity.hpp"
+#include "icc/socket.hpp"
 
 namespace StashSaves::Component 
 {
@@ -89,6 +91,7 @@ void v1::Monitor::init_impl() {
     	auto socket = socket_base_path / empire_name_socket;
     	std::cout << empires_save << " | socket: " << socket << std::endl;
     	_indexes.emplace_back(std::make_unique<Index>(empires_save, socket));
+		_sockets.emplace_back(std::move(socket));
     }
 
     for (auto&& index : _indexes)
@@ -99,9 +102,32 @@ void v1::Monitor::init_impl() {
 
 void v1::Monitor::start() {
 	std::cout << std::format("Monitor::start() - Monitor started at {}:{}", __func__, __LINE__) << std::endl;
+
+	std::size_t poll_number = 0u;
+
 	while(true)
 	{
 		sleep(1);
+		for(auto const& socket : _sockets)
+		{
+			try 
+			{
+				auto msg{ StashSaves::read_from_socket(socket) };
+				if(not msg.empty())
+				{
+					std::cout << std::format("[{}] socket: {} with message: {} ", poll_number, socket, msg) << std::endl;
+				}
+				else
+				{
+					std::cout << std::format("[{}] NO MESSAGE FOR socket: {}", poll_number, socket) << std::endl;
+				}
+			}
+			catch(std::exception& e)
+			{
+				std::cout << std::format("{} Error in {} - can't read from {} socket because {}", poll_number, __func__, socket, e.what()) << std::endl;
+			}
+			++poll_number;
+		}
 	}
 }
 

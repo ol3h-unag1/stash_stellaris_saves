@@ -282,6 +282,12 @@ fs::path get_socket_path(E_Plat_ID const& plat_id) {
     return "get_socket_path: Unreachable";
 }
 
+
+
+fs::path create_directory(fs::path const& dir);
+fs::path create_file(fs::path const& file);
+
+
 } // end of namespace StashSaves::Path
 
 

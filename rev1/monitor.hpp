@@ -1,4 +1,5 @@
 #pragma once
+
 #include <filesystem>
 #include <memory>
 #include <optional>
@@ -34,6 +35,7 @@ private:
 	fs::path _backup;
 
 	std::vector<std::unique_ptr<Index>> _indexes;
+	std::vector<std::string> _sockets;
 };
 // end of Module Component Monitor
 
