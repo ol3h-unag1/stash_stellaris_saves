@@ -14,7 +14,7 @@ DONE:
 FIRST OF ORDER:
    - refactor monitor: directory and file creation should be delegeted to StashSaves::Path
    - look thru other things too, write it down
-   - we need to incapsulte inter-component comunication and use socket as first version of implementation;
+   - we need to incapsulte inter-component communication and use socket as first version of implementation;
    - indexes should notify Monitor about files being created or deleted, monitor builds an array of files back up, let's say 10 files a portion, it copy the files and then removes them from original directory.
 
 PROCESS MANAGEMENT:
@@ -32,3 +32,11 @@ ISSUES:
    - [3] [Issue Postponed] (https://github.com/ol3h-unag1/stash_stellaris_saves/issues/3)
    - [4] [Issue Postponed] (https://github.com/ol3h-unag1/stash_stellaris_saves/issues/4)
    - [5] [To Open] inotify doesn't work for some reason - it's std::cout issues, be carefull [NOT AN ISSUE]
+
+DAILY:
+   - check mail for jobs;
+   - check sites for new openings:
+      https://www.jobs.cz/
+      https://www.startupjobs.cz/
+
+   - check for freelance projects.
