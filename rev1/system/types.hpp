@@ -7,6 +7,7 @@ namespace StashSaves::Types
 {
 
 using EnumUnderlyingType = std::int8_t;
+using IdType = std::uint16_t;
 
 constexpr EnumUnderlyingType INIT_ENUM_VALUE = -1;
 constexpr EnumUnderlyingType DEFAULT_ENUM_VALUE = 0;

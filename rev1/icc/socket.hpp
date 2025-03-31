@@ -1,9 +1,12 @@
 #pragma once
 
-#include <string>  // std::string
+#include <string>           // std::string
+#include <vector>           // std::vector
+#include <unordered_map>    // std::unordered_map
+#include <cstdint>          // std::uint16_t
+#include <any>              // std::any
 
-#include <cstdint> // std::uint16_t
-#include <any>     // std::any
+#include "message.hpp"
 
 namespace StashSaves
 {
@@ -14,25 +17,20 @@ std::string read_from_socket(const std::string& socket_path);
 }
 
 
-#include <type_traits> // std::conditional
-#include <vector>      // std::vector
-
 namespace Communication
 {
 
-using ContainerType = std::any;
 
-template<typename Type>
-struct Message 
-{
-    using DataType = Type;
-    ContainerType _container;
-};
+
+}
+
+#define DEBUG_COMMUNICATION
+#ifdef DEBUG_COMMUNICATION
 
 template<typename Type>
 auto create_message(Type data)  {
 
-    return Message<Type>{ std::move(data) };
+    return Communication::Message<Type>{ std::move(data) };
 }
 
 auto create_str_message() {
@@ -40,5 +38,4 @@ auto create_str_message() {
     return create_message<std::string>("UWUWUWUWUW!");
 }
 
-
-}
+#endif
