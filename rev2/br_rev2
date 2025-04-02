@@ -1,0 +1,72 @@
+#!/bin/sh
+
+# Colors for output
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Compiler and flags
+COMPILER="g++"
+FLAGS="-std=c++23 -Ofast"
+OUTPUT_EXE="monitor_exe"
+BUILD_DIR="build"
+PROJECT_ROOT=$(pwd)  # Store project root directory
+
+# Create build directory
+mkdir -p "$BUILD_DIR" || {
+  echo -e "${RED}Failed to create build directory!${NC}"
+  exit 1
+}
+
+# Find all .cpp files recursively (relative to project root), excluding main.cpp
+CPP_FILES=$(find "$PROJECT_ROOT" -type f -name "*.cpp" ! -name "main.cpp")
+
+# Check if any .cpp files were found
+if [ -z "$CPP_FILES" ]; then
+  echo -e "${RED}No .cpp files found!${NC}"
+  rm -rf "$BUILD_DIR"
+  exit 1
+fi
+
+# Move to build directory
+cd "$BUILD_DIR" || {
+  echo -e "${RED}Failed to enter build directory!${NC}"
+  rm -rf "$BUILD_DIR"
+  exit 1
+}
+
+# Build the .cpp files
+echo -e "${BLUE}Building the following .cpp files:${NC}"
+echo "$CPP_FILES" | sed "s|$PROJECT_ROOT/||g"  # Show relative paths
+echo ""
+
+# Compile with absolute paths
+$COMPILER $FLAGS -o "$OUTPUT_EXE" $CPP_FILES
+
+# Check if the build was successful
+if [ $? -eq 0 ]; then
+  echo -e "${GREEN}Build successful! Executable created: $OUTPUT_EXE${NC}"
+  echo -e "${BLUE}Running executable...${NC}"
+  ./"$OUTPUT_EXE"
+  EXIT_CODE=$?
+  echo -e "${BLUE}Executable finished with exit code: $EXIT_CODE${NC}"
+else
+  echo -e "${RED}Build failed!${NC}"
+  EXIT_CODE=1
+fi
+
+# Cleanup: Remove build directory
+cleanup() {
+  echo -e "${BLUE}Cleaning up build directory...${NC}"
+  cd ..
+  rm -rf "$BUILD_DIR"
+  echo -e "${GREEN}Cleanup complete.${NC}"
+  exit $EXIT_CODE
+}
+
+# Trap CTRL+C (SIGINT) and call cleanup
+trap cleanup INT
+
+# Call cleanup on script exit
+cleanup
