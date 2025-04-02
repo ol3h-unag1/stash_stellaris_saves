@@ -130,9 +130,8 @@ namespace Index_v1
 
 namespace Index_v2 
 {
-	Index::Index(fs::path dir_to_watch, CallbackType callback) 
-		: _directory(std::move(dir_to_watch))
-		, _callback(std::move(callback)) {
+	Index::Index(CallbackType callback) 
+		: _callback(std::move(callback)) {
 	
 	}
 
@@ -141,7 +140,8 @@ namespace Index_v2
 	}
 
 	void Index::watch_dir() {
-		std::cout << std::format("DUMMY V2", __func__, __LINE__) << std::endl;
+		std::cout << std::format("Dummy watch_dir V2", __func__, __LINE__) << std::endl;
+		_callback();
 	}
 
 } // end of namespace v2

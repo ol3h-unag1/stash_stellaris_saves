@@ -35,7 +35,7 @@ namespace Index_v1
 	};
 
 
-} // end of namespace StashSaves::Component::v1
+} // end of namespace StashSaves::Component::Index_v1
 
 namespace Index_v2
 {
@@ -45,23 +45,19 @@ namespace Index_v2
 	class Index final
 	{
 	private:
-		using CallbackType = std::function<void(Int, const fs::path&)>;
+		using CallbackType = std::function<void(void)>;
 
 	public:
-		explicit Index(fs::path dir_to_watch, CallbackType callback);
+		explicit Index(CallbackType callback);
 		~Index();
 
 	public:
 		void watch_dir();
 
 	private:
-		fs::path _directory;
 		CallbackType _callback;
 	};
 
-
-	namespace Index_Current_Version = Index_v2;
-
-}
+} // end of namespace StashSaves::Component::Index_v2
 
 } // end of namespace StashSaves::Component

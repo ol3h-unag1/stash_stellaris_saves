@@ -87,14 +87,23 @@ void Monitor::init_impl() {
 	}
 	
 	auto socket_base_path = plat_id->get_socket_path();
+	int key{ 0 };
 	for (auto&& empires_save : Util::get_flat_subdirectories(_saves))
     {
     	auto empire_name_socket = empires_save.filename().replace_extension(".sock");
     	auto socket = socket_base_path / empire_name_socket;
     	std::cout << "empires_save: " << empires_save << " | socket: " << socket << std::endl;
+		//_indexes.emplace_back(std::make_unique<Index>(empires_save, socket)); // v1 version
+
+		auto callback = [&key, &empires_save]() {
+			std::cout << std::format("Dummy callback triggered for key:{} path:{} at {}:{}", key, empires_save.string(), __func__, __LINE__) << std::endl;
+		};
+		_indexes.emplace_back(std::make_unique<Index>(std::move(callback)));
+
+		key++;
     }
 
-    for (auto&& index : _indexes)
+	for (auto&& index : _indexes)
     {
     	index->watch_dir();
     }

@@ -8,12 +8,19 @@
 namespace StashSaves::Component
 {
 
+// Forward declarations of Component types
+
+namespace Index_v2
+{
+	class Index;
+} 
+
+using Index = Index_v2::Index;
+
+// end of forward declarations of Component types
+
 inline namespace v1
 {
-
-// Forward declarations of Component types
-class Index;
-// end of forward declarations of Component types
 
 namespace fs = std::filesystem;
 
