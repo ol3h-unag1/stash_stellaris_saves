@@ -8,7 +8,7 @@
 namespace StashSaves::Component
 {
 
-inline namespace v1
+namespace v1
 {
 
 // Forward declarations of Component types
