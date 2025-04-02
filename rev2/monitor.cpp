@@ -11,8 +11,11 @@
 namespace StashSaves::Component 
 {
 
+namespace v1
+{
+
 // c-tor definition
-v1::Monitor::Monitor()
+Monitor::Monitor()
 try
 {
 	std::cout << std::format("Monitor::Monitor() - Body Begin") << std::endl;
@@ -28,7 +31,7 @@ catch(...)
 	std::cout << std::format("Monitor::Monitor() - Unknown exception. ") << std::endl;
 }
 
-void v1::Monitor::init()
+void Monitor::init()
 {
 	try
 	{
@@ -44,7 +47,7 @@ void v1::Monitor::init()
 	}
 }
 
-void v1::Monitor::init_impl() {
+void Monitor::init_impl() {
 
 	auto plat_id{ StashSaves::PlatformIdentity::instance() };
 	auto const current_user = plat_id->get_current_username();
@@ -97,7 +100,7 @@ void v1::Monitor::init_impl() {
     }
 }
 
-void v1::Monitor::start() {
+void Monitor::start() {
 	std::cout << std::format("Monitor::start() - Monitor started at {}:{}", __func__, __LINE__) << std::endl;
 
 	std::size_t poll_number = 0u;
@@ -110,6 +113,7 @@ void v1::Monitor::start() {
 	}
 }
 
+} // end namespace v1
 
 } // end namespace StashSaves::Component 
 
