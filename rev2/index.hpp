@@ -52,7 +52,7 @@ namespace v2
 		~Index();
 
 	public:
-		void dummy() const;
+		void watch_dir();
 
 	private:
 		fs::path _directory;

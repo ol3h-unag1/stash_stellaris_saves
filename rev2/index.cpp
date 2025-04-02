@@ -137,12 +137,13 @@ namespace v2
 	}
 
 	Index::~Index() {
-		std::cout << std::format("V2", __func__, __LINE__) << std::endl;
+		std::cout << std::format("DUMMY V2", __func__, __LINE__) << std::endl;
 	}
 
-	void Index::dummy() const {
-		std::cout << std::format("V2", __func__, __LINE__) << std::endl;
+	void Index::watch_dir() {
+		std::cout << std::format("DUMMY V2", __func__, __LINE__) << std::endl;
 	}
+
 } // end of namespace v2
 
 } // end of namespace StashSaves::Component
