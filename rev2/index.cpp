@@ -15,7 +15,7 @@
 namespace StashSaves::Component
 {
 
-namespace v1 
+namespace Index_v1 
 {
 	Index::Index(fs::path dir_to_watch, std::string socket) 
 		: _directory(std::move(dir_to_watch))
@@ -128,7 +128,7 @@ namespace v1
 
 } // end of namespace v1
 
-namespace v2 
+namespace Index_v2 
 {
 	Index::Index(fs::path dir_to_watch, CallbackType callback) 
 		: _directory(std::move(dir_to_watch))

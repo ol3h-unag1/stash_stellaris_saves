@@ -10,7 +10,7 @@
 namespace StashSaves::Component
 {
 
-namespace v1
+namespace Index_v1
 {
 
 	namespace fs = std::filesystem;
@@ -37,7 +37,7 @@ namespace v1
 
 } // end of namespace StashSaves::Component::v1
 
-namespace v2
+namespace Index_v2
 {
 	namespace fs = std::filesystem;
 	using Int = StashSaves::Util::Int;
@@ -58,6 +58,9 @@ namespace v2
 		fs::path _directory;
 		CallbackType _callback;
 	};
+
+
+	namespace Index_Current_Version = Index_v2;
 
 }
 
