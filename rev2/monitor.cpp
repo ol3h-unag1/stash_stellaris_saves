@@ -11,6 +11,8 @@
 namespace StashSaves::Component 
 {
 
+using Int = StashSaves::Util::Int;
+
 namespace v1
 {
 
@@ -87,10 +89,12 @@ void Monitor::init_impl() {
 		std::cout << std::format("Backup directory has been created: {} at {}:{}", _backup.string(), __func__, __LINE__) << std::endl;
 	}
 	
-
 	for (auto&& empire : Util::get_flat_subdirectories(_saves))
     {
     	std::cout << "empire: " << empire << std::endl;
+
+		_empire_to_saves_list[empire] = Util::get_files_in_directory(empire);
+		std::cout << "empire saves: " << _empire_to_saves_list[empire].size() << std::endl;
 
 		auto callback = [this, empire](fs::path save) {
 

@@ -41,4 +41,20 @@ std::vector<fs::path> v1::get_flat_subdirectories(const fs::path& dir) {
     return subdirectories;
 }
 
+std::vector<fs::path> v1::get_files_in_directory(const fs::path& directory) {
+
+    std::vector<fs::path> files;
+    files.reserve(256);  // Pre-allocate space for 256 entries
+    
+    for (const auto& entry : fs::directory_iterator(directory)) 
+    {
+        if(entry.is_regular_file()) 
+    {
+            files.push_back(entry.path());
+        }
+    }
+    
+    return files;
+}
+
 } // end namespace StashSaves::Util
