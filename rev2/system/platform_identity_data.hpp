@@ -17,6 +17,7 @@ enum class E_Platform_ID : Types::EnumUnderlyingType
     Windows,
     Linux,
     WSL,
+    MockPlarformIdentity,
 
     Error = Types::ERROR_ENUM_VALUE,
     Max = Types::MAX_ENUM_VALUE
