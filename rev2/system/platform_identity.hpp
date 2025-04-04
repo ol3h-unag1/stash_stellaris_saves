@@ -16,7 +16,7 @@ namespace fs = std::filesystem;
 
 class PlatformIdentity 
 {
-public:
+private:
     PlatformIdentity();
     virtual ~PlatformIdentity() = default;
     

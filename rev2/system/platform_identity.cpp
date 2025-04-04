@@ -84,8 +84,10 @@ catch(...)
 namespace StashSaves
 {
 
+#define DEBUG_GET_PLATFORM_ID
+
 PlatformIdentity::PlatformIdentity() 
-    : _platform_id(impl::get_platform()){
+    : _platform_id(impl::get_platform()) {
 
 #ifdef DEBUG_GET_PLATFORM_ID
     std::cout << std::format("{}: init block platform_id: {}", "PlatformIdentity::PlatformIdentity()", to_string(_platform_id)) << std::endl;
@@ -99,7 +101,6 @@ std::shared_ptr<PlatformIdentity::Access> PlatformIdentity::instance() {
     return instance;
 }
 
-#define DEBUG_GET_PLATFORM_ID_
 #ifdef DEBUG_GET_PLATFORM_ID
 auto PlatformIdentity::get_platform_id() const {
 
