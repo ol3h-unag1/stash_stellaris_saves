@@ -49,9 +49,10 @@ void Monitor::init()
 
 void Monitor::init_impl() {
 
-	auto plat_id{ StashSaves::PlatformIdentity::instance() };
-	auto const current_user = plat_id->get_current_username();
-	_saves = plat_id->get_save_games_path();
+	// auto plat_id{ StashSaves::PlatformIdentity::instance() };
+	auto plat_id{ StashSaves::PlatformIdentity::mock_instance() };
+
+    _saves = plat_id->get_save_games_path();
 	_backup = plat_id->get_backup_path();
 
 	if (not Util::is_directory_exists(_saves))
