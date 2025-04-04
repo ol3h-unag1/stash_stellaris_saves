@@ -4,6 +4,7 @@
 #include <memory>
 #include <optional>
 #include <vector>
+#include <unordered_map>
 
 namespace StashSaves::Component
 {
@@ -27,6 +28,10 @@ namespace fs = std::filesystem;
 // Module Component Monitor
 class Monitor
 {
+private:
+	using SavesList = std::vector<fs::path>;
+	using EmpiresSaves = std::unordered_map<fs::path, SavesList>;
+
 public:
 	Monitor();
 
@@ -42,6 +47,8 @@ private:
 	fs::path _backup;
 
 	std::vector<std::unique_ptr<Index>> _indexes;
+	
+	EmpiresSaves _empire_to_saves_list
 };
 // end of Module Component Monitor
 
