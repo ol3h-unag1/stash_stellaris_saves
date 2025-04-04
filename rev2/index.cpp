@@ -141,7 +141,7 @@ namespace Index_v2
 
 	void Index::watch_dir() {
 		std::cout << std::format("Dummy watch_dir V2", __func__, __LINE__) << std::endl;
-		_callback();
+		_callback("dummy_path");
 	}
 
 } // end of namespace v2

@@ -87,17 +87,17 @@ void Monitor::init_impl() {
 		std::cout << std::format("Backup directory has been created: {} at {}:{}", _backup.string(), __func__, __LINE__) << std::endl;
 	}
 	
-	int key{ 0 };
+
 	for (auto&& empires_save : Util::get_flat_subdirectories(_saves))
     {
     	std::cout << "empires_save: " << empires_save << std::endl;
 
-		auto callback = [key, empires_save]() {
-			std::cout << std::format("Dummy callback triggered for key:{} path:{} at {}:{}", key, empires_save.string(), __func__, __LINE__) << std::endl;
-		};
-		_indexes.emplace_back(std::make_unique<Index>(std::move(callback)));
+		auto callback = [this, empires_save](fs::path save) {
 
-		key++;
+			index_callback(empires_save, save);
+		};
+
+		_indexes.emplace_back(std::make_unique<Index>(std::move(callback)));
     }
 
 	for (auto&& index : _indexes)

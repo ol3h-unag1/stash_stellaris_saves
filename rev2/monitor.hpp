@@ -43,12 +43,18 @@ private:
 	void init_impl();
 
 private:
+	void index_callback(const fs::path& empires, const fs::path& save)
+	{
+		std::cout << std::format("Dummy callback triggered for empires:{} save:{} at {}:{}", empires.string(), save.string(), __func__, __LINE__) << std::endl;
+	}
+
+private:
 	fs::path _saves;
 	fs::path _backup;
 
 	std::vector<std::unique_ptr<Index>> _indexes;
 	
-	EmpiresSaves _empire_to_saves_list
+	EmpiresSaves _empire_to_saves_list;
 };
 // end of Module Component Monitor
 
