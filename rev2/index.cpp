@@ -4,7 +4,6 @@
 #include <vector>
 #include <exception>
 #include <filesystem>
-#include <thread>
 
 
 #include <sys/inotify.h>
@@ -175,6 +174,7 @@ namespace details
 	                if (event->mask & IN_CREATE) 
 					{
 	                    std::cerr << "Index::watch_dir_impl() File created: " << event->name << std::endl;
+						callback(fs::path{event->name});
 						//throw std::runtime_error("Created");
 	                } 
 					else
@@ -200,20 +200,28 @@ namespace details
 } // end of namespace details
 
 
-	Index::Index(fs::path dir_to_watch, CallbackType callback) 
+	Index::Index(fs::path dir_to_watch, CallbackType callback)
 		: _directory(std::move(dir_to_watch)) 
 		, _callback(std::move(callback)) {
 	
 	}
 
 	Index::~Index() {
+
 		std::cout << std::format("DUMMY V2", __func__, __LINE__) << std::endl;
+
+		if (_thread.joinable()) 
+		{
+			_thread.join();
+		}
 	}
 
 	
 	void Index::watch_dir() {
+
 		std::cout << std::format("watching dir{} at {}:{}", _directory.string(),  __func__, __LINE__) << std::endl;
-		_callback("dummy file name");
+		_thread = std::thread(details::inotify_impl, _directory, _callback);
+
 	}
 
 } // end of namespace v2

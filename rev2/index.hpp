@@ -3,6 +3,8 @@
 #include <filesystem>
 #include <string>
 #include <functional>
+#include <thread>
+
 #include <sys/types.h> 
 
 #include "util.hpp"
@@ -60,6 +62,8 @@ namespace Index_v2
 	private:
 		fs::path _directory;
 		CallbackType _callback;
+
+		std::thread _thread;
 	};
 
 } // end of namespace StashSaves::Component::Index_v2
