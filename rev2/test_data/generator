@@ -1,0 +1,79 @@
+#!/bin/bash
+
+state_file="generator.state"
+
+# Function to write the current state to the file
+write_state() {
+    echo "Apples:$apples" > "$state_file"
+    echo "Bananas:$bananas" >> "$state_file"
+    echo "Oranges:$oranges" >> "$state_file"
+}
+
+# Initialize counters
+apples=1
+bananas=1
+oranges=1
+
+# Read the state file if it exists
+if [ -f "$state_file" ]; then
+    while IFS= read -r line; do
+        key=$(echo "$line" | cut -d':' -f1)
+        value=$(echo "$line" | cut -d':' -f2)
+        case "$key" in
+            Apples) apples="$value" ;;
+            Bananas) bananas="$value" ;;
+            Oranges) oranges="$value" ;;
+        esac
+    done < "$state_file"
+else
+    # Create initial state file
+    write_state
+fi
+
+# Ensure counters are integers
+apples=$((apples))
+bananas=$((bananas))
+oranges=$((oranges))
+
+# Handle Ctrl+C to exit the loop gracefully
+interrupted=false
+trap 'interrupted=true' SIGINT
+
+echo "Script started. Press Ctrl+C to stop."
+
+# Main loop to create files every second
+while ! $interrupted; do
+    # Create 1 orange file
+    orange_file="Oranges/orange_${oranges}.or"
+    touch "$orange_file"
+    echo "Created $orange_file"
+    oranges=$((oranges + 1))
+    
+    # Create 2 banana files
+    i=0
+    while [ $i -lt 2 ]; do
+        banana_file="Bananas/banana_$((bananas + i)).bn"
+        touch "$banana_file"
+        echo "Created $banana_file"
+        i=$((i + 1))
+    done
+    bananas=$((bananas + 2))
+    
+    # Create 3 apple files
+    i=0
+    while [ $i -lt 3 ]; do
+        apple_file="Apples/apple_$((apples + i)).ap"
+        touch "$apple_file"
+        echo "Created $apple_file"
+        i=$((i + 1))
+    done
+    apples=$((apples + 3))
+    
+    # Update the state file
+    write_state
+    
+    # Wait for 1 second
+    sleep 1
+done
+
+echo "Script stopped."
