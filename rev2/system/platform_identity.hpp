@@ -16,6 +16,11 @@ namespace fs = std::filesystem;
 
 class PlatformIdentity 
 {
+    //mock c-tor
+private:
+    PlatformIdentity(E_Platform_ID);
+
+    // real c-tor
 private:
     PlatformIdentity();
     virtual ~PlatformIdentity() = default;
@@ -30,6 +35,7 @@ private:
 
 public:
     static std::shared_ptr<PlatformIdentity::Access> instance();
+    static std::shared_ptr<PlatformIdentity::Access> mock_instance();
 
 #ifdef DEBUG_GET_PLATFORM_ID
 public:
@@ -48,6 +54,10 @@ private:
 
 struct PlatformIdentity::Access final : public PlatformIdentity 
 {
+    // mock c-tor
+    Access(E_Platform_ID platform_id);
+
+    // real c-tor
     Access() = default;
     ~Access() override = default;
 };

@@ -86,6 +86,7 @@ namespace StashSaves
 
 #define DEBUG_GET_PLATFORM_ID
 
+// real c-tor
 PlatformIdentity::PlatformIdentity() 
     : _platform_id(impl::get_platform()) {
 
@@ -95,9 +96,24 @@ PlatformIdentity::PlatformIdentity()
 #endif
 }
 
+// mock c-tor
+PlatformIdentity::PlatformIdentity(E_Platform_ID platform_id) 
+    : _platform_id(platform_id) {
+#ifdef DEBUG_GET_PLATFORM_ID
+        std::cout << std::format("{}: init block platform_id: {}", "PlatformIdentity::PlatformIdentity()", to_string(_platform_id)) << std::endl;
+        std::cout << std::format("{}: body block platform_id: {}", "PlatformIdentity::PlatformIdentity()", to_string(impl::get_platform())) << std::endl;
+#endif
+}
+
 std::shared_ptr<PlatformIdentity::Access> PlatformIdentity::instance() {
 
     static std::shared_ptr<PlatformIdentity::Access> instance{ std::make_shared<PlatformIdentity::Access>() };
+    return instance;
+}
+
+std::shared_ptr<PlatformIdentity::Access> PlatformIdentity::mock_instance() {
+
+    static std::shared_ptr<PlatformIdentity::Access> instance{ std::make_shared<PlatformIdentity::Access>(E_Platform_ID::MockPlarformIdentity) };
     return instance;
 }
 
@@ -128,6 +144,10 @@ fs::path PlatformIdentity::get_socket_path() const {
     return Path::get_socket_path(_platform_id);
 }
 
+PlatformIdentity::Access::Access(E_Platform_ID platform_id) 
+    : PlatformIdentity(platform_id) 
+{}
+    
 } // end of namespace StashSaves 
 
 // int main()

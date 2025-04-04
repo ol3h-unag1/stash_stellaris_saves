@@ -25,10 +25,14 @@ std::string to_string(StashSaves::E_Platform_ID id) {
     case E_Platform_ID::WSL:
         return "E_Platform_ID::WSL";
         
+    case E_Platform_ID::MockPlarformIdentity:
+        return "E_Platform_ID::MockPlarformIdentity";
+    
     case E_Platform_ID::Error:
         return "E_Platform_ID::Error";    
     case E_Platform_ID::Max:
         return "E_Platform_ID::Max";
+
     default:
         return std::format("{} undefined E_Platform_ID value: {}", __func__, static_cast<std::underlying_type_t<E_Platform_ID>>(id));
     }

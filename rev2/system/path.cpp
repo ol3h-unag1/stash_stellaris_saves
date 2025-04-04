@@ -230,6 +230,10 @@ fs::path get_save_games_path(E_Plat_ID const& plat_id) {
     {
         return build_path("/home", get_current_username(plat_id), G_game_path_linux);
     }
+    else if(E_Plat_ID::MockPlarformIdentity == plat_id) 
+    {
+        return fs::path{"../test_data/"};
+    }
     else
     {
         return "get_save_games_path: Unsupported platform";
@@ -251,6 +255,10 @@ fs::path get_backup_path(E_Plat_ID const& plat_id) {
     else if(E_Plat_ID::Linux == plat_id) 
     {
         return build_path("/home", get_current_username(plat_id), G_user_backup_path);
+    }
+    else if(E_Plat_ID::MockPlarformIdentity == plat_id) 
+    {
+        return fs::path{"../test_backup/"};
     }
     else
     {
