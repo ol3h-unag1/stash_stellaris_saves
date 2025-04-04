@@ -88,16 +88,16 @@ void Monitor::init_impl() {
 	}
 	
 
-	for (auto&& empires_save : Util::get_flat_subdirectories(_saves))
+	for (auto&& empire : Util::get_flat_subdirectories(_saves))
     {
-    	std::cout << "empires_save: " << empires_save << std::endl;
+    	std::cout << "empire: " << empire << std::endl;
 
-		auto callback = [this, empires_save](fs::path save) {
+		auto callback = [this, empire](fs::path save) {
 
-			index_callback(empires_save, save);
+			index_callback(empire, save);
 		};
 
-		_indexes.emplace_back(std::make_unique<Index>(std::move(callback)));
+		_indexes.emplace_back(std::make_unique<Index>(std::move(empire), std::move(callback)));
     }
 
 	for (auto&& index : _indexes)

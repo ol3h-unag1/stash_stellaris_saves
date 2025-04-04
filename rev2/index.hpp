@@ -44,11 +44,11 @@ namespace Index_v2
 
 	class Index final
 	{
-	private:
+	public:
 		using CallbackType = std::function<void(fs::path)>;
 
 	public:
-		explicit Index(CallbackType callback);
+		explicit Index(fs::path dir_to_watch, CallbackType callback);
 		~Index();
 
 	public:
@@ -58,6 +58,7 @@ namespace Index_v2
 		void watch_dir_impl();
 
 	private:
+		fs::path _directory;
 		CallbackType _callback;
 	};
 
