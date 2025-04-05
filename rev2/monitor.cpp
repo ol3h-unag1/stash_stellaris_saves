@@ -19,8 +19,9 @@ namespace v1
 {
 
 // c-tor definition
-Monitor::Monitor()
+Monitor::Monitor(std::size_t file_limit)
 try
+: _portion_size(file_limit/2) // half this shit; just why not
 {
 	std::cout << std::format("Monitor::Monitor() - Body Begin") << std::endl;
 	init();
@@ -135,6 +136,11 @@ void Monitor::index_callback(const fs::path& empire, const fs::path& save)
 	{
 		auto& saves = empire_it->second;
 		saves.push_back(save);
+		if (saves.size() > 10)
+		{
+			sleep(5);
+			std::cout << "TID: " << std::this_thread::get_id() << std::format(" | Empire: {} | SavesList: {} at {}:{}", empire.string(), saves.size(), __func__, __LINE__) << std::endl;
+		}
 	}
 	else
 	{
@@ -156,7 +162,7 @@ int main()
 try
 {
 	using Monitor = StashSaves::Component::Monitor;
-	Monitor mon;
+	Monitor mon(200);
 
 	mon.start();
 

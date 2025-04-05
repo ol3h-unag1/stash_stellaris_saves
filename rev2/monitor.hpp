@@ -33,7 +33,7 @@ private:
 	using EmpiresSaves = std::unordered_map<fs::path, SavesList>;
 
 public:
-	Monitor();
+	Monitor(std::size_t);
 
 public:
 	void start();
@@ -55,6 +55,9 @@ private:
 	std::vector<std::unique_ptr<Index>> _indexes;
 	
 	EmpiresSaves _empire_to_saves_list;
+
+private:
+	std::size_t _portion_size = 0u;
 };
 // end of Module Component Monitor
 

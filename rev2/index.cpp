@@ -145,7 +145,7 @@ namespace details
 	    }
 
 	    // Add a watch for the specified directory
-	    int watch_descriptor = inotify_add_watch(inotify_fd, dir_to_watch.string().c_str(), IN_CREATE );
+	    int watch_descriptor = inotify_add_watch(inotify_fd, dir_to_watch.string().c_str(), IN_CREATE /* | IN_DELETE | ... */);
 	    if (watch_descriptor == -1) {
 	        close(inotify_fd);
 			throw std::runtime_error(std::format("Failed to add inotify watch: {} in function {} line {}", std::strerror(errno), __func__, __LINE__));
