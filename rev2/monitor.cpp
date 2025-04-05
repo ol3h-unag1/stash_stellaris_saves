@@ -1,6 +1,8 @@
 #include <iostream>
 #include <format>
 #include <exception>
+#include <thread>
+
 
 #include "monitor.hpp"
 #include "index.hpp"
@@ -121,6 +123,24 @@ void Monitor::start() {
 		std::cout << std::format("Monitor::start() - Polling... {} at {}:{}", poll_number++, __func__, __LINE__) << std::endl;
 	
 	}
+}
+
+void Monitor::index_callback(const fs::path& empire, const fs::path& save)
+{
+	std::cout << "MONITOR's INDEX CALLBACK | TID: " << std::this_thread::get_id() << std::endl;
+	std::cout << std::format("Monitor::index_callback() - Empire: {} | Save: {} at {}:{}", empire.string(), save.string(), __func__, __LINE__) << std::endl;
+
+	auto empire_it = _empire_to_saves_list.find(empire);
+	if (empire_it != _empire_to_saves_list.end())
+	{
+		auto& saves = empire_it->second;
+		saves.push_back(save);
+	}
+	else
+	{
+		std::cout << std::format("Monitor::index_callback() - Empire not found: {} at {}:{}", empire.string(), __func__, __LINE__) << std::endl;
+	}	
+
 }
 
 } // end namespace v1

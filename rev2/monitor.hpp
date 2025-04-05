@@ -46,10 +46,7 @@ private:
 	void backup(fs::path empire, SavesList saves);
 
 private:
-	void index_callback(const fs::path& empires, const fs::path& save)
-	{
-		std::cout << std::format("Dummy callback triggered for empires:{} save:{} at {}:{}", empires.string(), save.string(), __func__, __LINE__) << std::endl;
-	}
+	void index_callback(const fs::path& empires, const fs::path& save);
 
 private:
 	fs::path _saves;
