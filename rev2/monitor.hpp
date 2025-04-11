@@ -43,7 +43,7 @@ private:
 	void init_impl();
 
 private:
-	void backup(fs::path empire, SavesList saves);
+	void backup_saves(fs::path empire, SavesList saves);
 
 private:
 	void index_callback(const fs::path& empires, const fs::path& save);

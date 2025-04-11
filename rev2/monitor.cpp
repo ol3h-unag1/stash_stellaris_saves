@@ -23,7 +23,7 @@ Monitor::Monitor(std::size_t file_limit)
 try
 : _portion_size(file_limit/2) // half this shit; just why not
 {
-	std::cout << std::format("Monitor::Monitor() - Body Begin") << std::endl;
+	std::cout << std::format("Monitor::Monitor() - Body Begin. file limit to dir:{} portion size:{}", file_limit, _portion_size ) << std::endl;
 	init();
 	std::cout << std::format("Monitor::Monitor() - Body End") << std::endl;
 }
@@ -98,6 +98,10 @@ void Monitor::init_impl() {
 
 		_empire_to_saves_list[empire] = Util::get_files_in_directory(empire);
 		std::cout << "empire saves: " << _empire_to_saves_list[empire].size() << std::endl;
+		if (_empire_to_saves_list[empire].size() >= _portion_size)
+		{
+			backup_saves(empire, _empire_to_saves_list[empire]);
+		}	
 
 		auto callback = [this, empire](fs::path save) {
 
@@ -126,8 +130,33 @@ void Monitor::start() {
 	}
 }
 
-void Monitor::index_callback(const fs::path& empire, const fs::path& save)
-{
+void Monitor::backup_saves(fs::path empire, SavesList saves) {
+
+    std::cout << std::format("Monitor::backup() - Empire: {} | SavesList: {} at {}:{}", 
+                            empire.string(), saves.size(), __func__, __LINE__) << std::endl;
+
+    for (auto&& save : saves)
+    {
+        try {
+            // Create target directory structure
+            auto backup_path = _backup / empire.filename() / save.filename();
+            fs::create_directories(backup_path.parent_path());
+
+            std::cout << std::format("Monitor::backup() - Copying {} to {} at {}:{}",
+                                    save.string(), backup_path.string(), __func__, __LINE__) << std::endl;
+
+            // Copy the file with overwrite
+            fs::copy_file(save, backup_path, fs::copy_options::overwrite_existing);
+        }
+        catch(const fs::filesystem_error& e) {
+            std::cerr << std::format("Failed to copy {}: {} at {}:{}",
+                                   save.string(), e.what(), __func__, __LINE__) << std::endl;
+        }
+    }
+}
+
+void Monitor::index_callback(const fs::path& empire, const fs::path& save) {
+	
 	std::cout << "MONITOR's INDEX CALLBACK | TID: " << std::this_thread::get_id() << std::endl;
 	std::cout << std::format("Monitor::index_callback() - Empire: {} | Save: {} at {}:{}", empire.string(), save.string(), __func__, __LINE__) << std::endl;
 
@@ -138,7 +167,6 @@ void Monitor::index_callback(const fs::path& empire, const fs::path& save)
 		saves.push_back(save);
 		if (saves.size() > 10)
 		{
-			sleep(5);
 			std::cout << "TID: " << std::this_thread::get_id() << std::format(" | Empire: {} | SavesList: {} at {}:{}", empire.string(), saves.size(), __func__, __LINE__) << std::endl;
 		}
 	}
