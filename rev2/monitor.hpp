@@ -43,7 +43,7 @@ private:
 	void init_impl();
 
 private:
-	void backup_saves(fs::path empire, SavesList saves);
+	void backup_saves(fs::path empire);
 
 private:
 	void index_callback(const fs::path& empires, const fs::path& save);
@@ -57,7 +57,7 @@ private:
 	EmpiresSaves _empire_to_saves_list;
 
 private:
-	std::size_t _portion_size = 0u;
+	std::size_t const _portion_size = 0u;
 };
 // end of Module Component Monitor
 

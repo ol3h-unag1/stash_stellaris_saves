@@ -100,7 +100,7 @@ void Monitor::init_impl() {
 		std::cout << "empire saves: " << _empire_to_saves_list[empire].size() << std::endl;
 		if (_empire_to_saves_list[empire].size() >= _portion_size)
 		{
-			backup_saves(empire, _empire_to_saves_list[empire]);
+			backup_saves(empire);
 		}	
 
 		auto callback = [this, empire](fs::path save) {
@@ -130,15 +130,21 @@ void Monitor::start() {
 	}
 }
 
-void Monitor::backup_saves(fs::path empire, SavesList saves) {
+void Monitor::backup_saves(fs::path empire) {
 
-    std::cout << std::format("Monitor::backup() - Empire: {} | SavesList: {} at {}:{}", 
-                            empire.string(), saves.size(), __func__, __LINE__) << std::endl;
+	auto& saves_list = _empire_to_saves_list[empire];
+    std::cout << std::format("TID: Monitor::backup() - Empire: {} | SavesList: {} at {}:{}", std::this_thread::get_id(),
+                            empire.string(), saves_list.size(), __func__, __LINE__) << std::endl;
 
-    for (auto&& save : saves)
-    {
+    // Determine the number of elements to process (up to _portion_size)
+    size_t portion = std::min(_portion_size, saves_list.size());
+
+    for (size_t i = 0; i < portion; ++i) {
+        // Use a reference to avoid copying the path
+        const auto& save = saves_list[i];
+
         try {
-            // Create target directory structure
+            // Create backup directory structure
             auto backup_path = _backup / empire.filename() / save.filename();
             fs::create_directories(backup_path.parent_path());
 
@@ -147,12 +153,29 @@ void Monitor::backup_saves(fs::path empire, SavesList saves) {
 
             // Copy the file with overwrite
             fs::copy_file(save, backup_path, fs::copy_options::overwrite_existing);
+
+            // Construct the original file path using _saves data member
+            fs::path original_path = _saves / empire.filename() / save.filename();
+
+            // Delete the original file
+            if (fs::remove(original_path)) {
+                std::cout << std::format("Deleted original file: {} at {}:{}", 
+                                        original_path.string(), __func__, __LINE__) << std::endl;
+            } else {
+                std::cout << std::format("Original file {} not found at {}:{}", 
+                                        original_path.string(), __func__, __LINE__) << std::endl;
+            }
         }
         catch(const fs::filesystem_error& e) {
-            std::cerr << std::format("Failed to copy {}: {} at {}:{}",
+            std::cout << std::format("Failed to process {}: {} at {}:{}",
                                    save.string(), e.what(), __func__, __LINE__) << std::endl;
         }
     }
+
+    // Remove the first 'portion' elements from the saves_list
+    saves_list.erase(saves_list.begin(), saves_list.begin() + portion);
+	std::cout << std::format("Monitor::backup() - Remaining saves: {} at {}:{}", 
+							saves_list.size(), __func__, __LINE__) << std::endl;
 }
 
 void Monitor::index_callback(const fs::path& empire, const fs::path& save) {
@@ -165,16 +188,18 @@ void Monitor::index_callback(const fs::path& empire, const fs::path& save) {
 	{
 		auto& saves = empire_it->second;
 		saves.push_back(save);
-		if (saves.size() > 10)
+		if (saves.size() >= _portion_size)
 		{
-			std::cout << "TID: " << std::this_thread::get_id() << std::format(" | Empire: {} | SavesList: {} at {}:{}", empire.string(), saves.size(), __func__, __LINE__) << std::endl;
+			std::cout << "Calling for backup from TID: " << std::this_thread::get_id() 
+				<< std::format(" | Empire: {} | SavesList: {} at {}:{}", empire.string(), saves.size(), __func__, __LINE__) << std::endl;
+			
+			backup_saves(empire);
 		}
 	}
 	else
 	{
 		std::cout << std::format("Monitor::index_callback() - Empire not found: {} at {}:{}", empire.string(), __func__, __LINE__) << std::endl;
 	}	
-
 }
 
 } // end namespace v1
@@ -189,8 +214,9 @@ int main()
 #ifdef RUN
 try
 {
+	std::size_t const G_Stellaris_Saves_Limit = 200;
 	using Monitor = StashSaves::Component::Monitor;
-	Monitor mon(200);
+	Monitor mon(G_Stellaris_Saves_Limit);
 
 	mon.start();
 
