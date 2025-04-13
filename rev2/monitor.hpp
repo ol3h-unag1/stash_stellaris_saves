@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <memory>
 #include <optional>
-#include <vector>
+#include <queue>
 #include <unordered_map>
 
 namespace StashSaves::Component
@@ -29,7 +29,7 @@ namespace fs = std::filesystem;
 class Monitor
 {
 private:
-	using SavesList = std::vector<fs::path>;
+	using SavesList = std::queue<fs::path>;
 	using EmpiresSaves = std::unordered_map<fs::path, SavesList>;
 
 public:
@@ -47,6 +47,9 @@ private:
 
 private:
 	void index_callback(const fs::path& empires, const fs::path& save);
+
+private:
+	void log_state(fs::path empire) const;
 
 private:
 	fs::path _saves;

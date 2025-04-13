@@ -94,11 +94,16 @@ void Monitor::init_impl() {
 	
 	for (auto&& empire : Util::get_flat_subdirectories(_saves))
     {
-    	std::cout << "empire: " << empire << std::endl;
+		auto& save_list = _empire_to_saves_list[empire];
+		for(auto&& save : Util::get_files_in_directory(empire))
+		{
+			save_list.push(save);
+		}
+		
+		std::cout << std::format("Monitor::init_impl() - Empire: {} | SavesList: {} at {}:{}", empire.string(), save_list.size(), __func__, __LINE__) << std::endl;
 
-		_empire_to_saves_list[empire] = Util::get_files_in_directory(empire);
-		std::cout << "empire saves: " << _empire_to_saves_list[empire].size() << std::endl;
-		if (_empire_to_saves_list[empire].size() >= _portion_size)
+
+		if (save_list.size() >= _portion_size)
 		{
 			backup_saves(empire);
 		}	
@@ -118,6 +123,7 @@ void Monitor::init_impl() {
 }
 
 void Monitor::start() {
+
 	std::cout << std::format("Monitor::start() - Monitor started at {}:{}", __func__, __LINE__) << std::endl;
 
 	std::size_t poll_number = 0u;
@@ -131,52 +137,41 @@ void Monitor::start() {
 }
 
 void Monitor::backup_saves(fs::path empire) {
-
-	auto& saves_list = _empire_to_saves_list[empire];
-    std::cout << "TID: " << std::this_thread::get_id() 
-		<< std::format("Monitor::backup() - Empire: {} | SavesList: {} at {}:{}",
-                            empire.string(), saves_list.size(), __func__, __LINE__) << std::endl;
-
-    // Determine the number of elements to process (up to _portion_size)
-    size_t portion = std::min(_portion_size, saves_list.size());
+    auto& saves_queue = _empire_to_saves_list[empire];
+    const size_t portion = std::min(_portion_size, saves_queue.size());
 
     for (size_t i = 0; i < portion; ++i) {
-        // Use a reference to avoid copying the path
-        const auto& save = saves_list[i];
-
+        const fs::path save = saves_queue.front();
+        
         try {
-            // Create backup directory structure
-            auto backup_path = _backup / empire.filename() / save.filename();
+            // Set up backup paths
+            const fs::path backup_path = _backup / empire.filename() / save.filename();
             fs::create_directories(backup_path.parent_path());
 
-            std::cout << std::format("Monitor::backup() - Copying {} to {} at {}:{}",
-                                    save.string(), backup_path.string(), __func__, __LINE__) << std::endl;
-
-            // Copy the file with overwrite
+            // Copy file
+            std::cout << std::format("Backing up {} -> {}", save.string(), backup_path.string())
+                      << std::endl;
             fs::copy_file(save, backup_path, fs::copy_options::overwrite_existing);
 
-            // Construct the original file path using _saves data member
-            fs::path original_path = _saves / empire.filename() / save.filename();
-
-            // Delete the original file
-            if (fs::remove(original_path)) {
-                std::cout << std::format("Deleted original file: {} at {}:{}", 
-                                        original_path.string(), __func__, __LINE__) << std::endl;
-            } else {
-                std::cout << std::format("Original file {} not found at {}:{}", 
-                                        original_path.string(), __func__, __LINE__) << std::endl;
+            // Remove original
+            std::cout << std::format("Removing original: {}", save.string()) << std::endl;
+            if (!fs::remove(save)) {
+                throw std::runtime_error(std::format("Failed to remove original file: {}", save.string()));
             }
+
+            saves_queue.pop();
         }
-        catch(const fs::filesystem_error& e) {
-            std::cout << std::format("Failed to process {}: {} at {}:{}",
-                                   save.string(), e.what(), __func__, __LINE__) << std::endl;
+        catch (const fs::filesystem_error& e) {
+            log_state(empire);
+            std::throw_with_nested(std::runtime_error(
+                std::format("Filesystem error during backup: {}", e.what())
+            ));
+        }
+        catch (const std::exception& e) {
+            log_state(empire);
+            throw;  // Re-throw after logging
         }
     }
-
-    // Remove the first 'portion' elements from the saves_list
-    saves_list.erase(saves_list.begin(), saves_list.begin() + portion);
-	std::cout << std::format("Monitor::backup() - Remaining saves: {} at {}:{}", 
-							saves_list.size(), __func__, __LINE__) << std::endl;
 }
 
 void Monitor::index_callback(const fs::path& empire, const fs::path& save) {
@@ -188,7 +183,7 @@ void Monitor::index_callback(const fs::path& empire, const fs::path& save) {
 	if (empire_it != _empire_to_saves_list.end())
 	{
 		auto& saves = empire_it->second;
-		saves.push_back(save);
+		saves.push(save);
 		if (saves.size() >= _portion_size)
 		{
 			std::cout << "Calling for backup from TID: " << std::this_thread::get_id() 
@@ -199,8 +194,43 @@ void Monitor::index_callback(const fs::path& empire, const fs::path& save) {
 	}
 	else
 	{
-		std::cout << std::format("Monitor::index_callback() - Empire not found: {} at {}:{}", empire.string(), __func__, __LINE__) << std::endl;
+		throw std::runtime_error(std::format("Monitor::index_callback() - Empire not found: {} at {}:{}", empire.string(), __func__, __LINE__));
 	}	
+}
+
+void Monitor::log_state(fs::path empire) const {
+
+	std::cout << "\n=== CRITICAL STATE DUMP ===" << std::endl;
+	std::cout << std::format("[Empire: {}]", empire.string()) << std::endl;
+	
+	// Dump queue state
+	auto queue = _empire_to_saves_list.at(empire);
+	std::cout << std::format("Pending saves in queue: {}", queue.size()) << std::endl;
+	std::size_t saves_counter = 0;
+	while (not queue.empty()) 
+	{
+		std::cout << saves_counter++ << ": " << queue.front().string() << std::endl;
+		queue.pop();
+	}
+
+	// Dump actual files in source directory
+	std::cout << "Files in source directory (" << _saves/empire.filename() << "):\n";
+	for (const auto& entry : fs::directory_iterator(_saves/empire.filename())) 
+	{
+		std::cout << "  " << entry.path().filename().string() << std::endl;
+	}
+
+	// Dump backup directory contents
+	const fs::path backup_dir = _backup/empire.filename();
+	std::cout << "Files in backup directory (" << backup_dir << "):\n";
+	if (fs::exists(backup_dir)) 
+	{
+		for (const auto& entry : fs::directory_iterator(backup_dir))
+		{
+			std::cout << "  " << entry.path().filename().string() << std::endl;
+		}
+	}
+	std::cout << "===========================\n" << std::endl;
 }
 
 } // end namespace v1
