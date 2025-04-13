@@ -133,7 +133,8 @@ void Monitor::start() {
 void Monitor::backup_saves(fs::path empire) {
 
 	auto& saves_list = _empire_to_saves_list[empire];
-    std::cout << std::format("TID: Monitor::backup() - Empire: {} | SavesList: {} at {}:{}", std::this_thread::get_id(),
+    std::cout << "TID: " << std::this_thread::get_id() 
+		<< std::format("Monitor::backup() - Empire: {} | SavesList: {} at {}:{}",
                             empire.string(), saves_list.size(), __func__, __LINE__) << std::endl;
 
     // Determine the number of elements to process (up to _portion_size)
