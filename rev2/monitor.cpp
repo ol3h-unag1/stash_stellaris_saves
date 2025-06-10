@@ -140,22 +140,22 @@ void Monitor::backup_saves(fs::path empire) {
     auto& saves_queue = _empire_to_saves_list[empire];
     const size_t portion = std::min(_portion_size, saves_queue.size());
 
-    for (size_t i = 0; i < portion; ++i) {
-        const fs::path save = saves_queue.front();
-        
+    for (size_t i = 0; i < portion; ++i) {      
         try {
+			const fs::path save_path = empire / saves_queue.front();
+
             // Set up backup paths
             const fs::path backup_path = _backup / empire.filename() / save.filename();
             fs::create_directories(backup_path.parent_path());
 
             // Copy file
-            std::cout << std::format("Backing up {} -> {}", save.string(), backup_path.string())
+            std::cout << std::format("Backing up {} -> {}", save_path.string(), backup_path.string())
                       << std::endl;
-            fs::copy_file(save, backup_path, fs::copy_options::overwrite_existing);
+            fs::copy_file(save_path, backup_path, fs::copy_options::overwrite_existing);
 
             // Remove original
-            std::cout << std::format("Removing original: {}", save.string()) << std::endl;
-            if (!fs::remove(save)) {
+            std::cout << std::format("Removing original: {}", save_path.string()) << std::endl;
+            if (!fs::remove(save_path)) {
                 throw std::runtime_error(std::format("Failed to remove original file: {}", save.string()));
             }
 
@@ -186,7 +186,7 @@ void Monitor::index_callback(const fs::path& empire, const fs::path& save) {
 		saves.push(save);
 		if (saves.size() >= _portion_size)
 		{
-			std::cout << "Calling for backup from TID: " << std::this_thread::get_id() 
+			std::cout << "Monitor::index_callback() calling backup"
 				<< std::format(" | Empire: {} | SavesList: {} at {}:{}", empire.string(), saves.size(), __func__, __LINE__) << std::endl;
 			
 			backup_saves(empire);
