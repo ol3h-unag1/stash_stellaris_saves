@@ -167,13 +167,13 @@ namespace details
 	            while (i < length) {
 	                inotify_event* event = reinterpret_cast<inotify_event*>(&buffer[i]);
 
-					std::cerr << "Index::watch_dir_impl() Event: " << event->wd << " mask: " << event->mask 
+					std::cerr << "inotify_impl Event: " << event->wd << " mask: " << event->mask 
 						      << " cookie: " << event->cookie << " len: " << event->len << std::endl;
 	                
 					// Handle different types of events
 	                if (event->mask & IN_CREATE) 
 					{
-	                    std::cerr << "Index::watch_dir_impl() File created: " << event->name << std::endl;
+	                    std::cerr << std::this_thread::get_id() << ": inotify_impl File created: " << event->name << std::endl;
 						callback(fs::path{event->name});
 						//throw std::runtime_error("Created");
 	                } 

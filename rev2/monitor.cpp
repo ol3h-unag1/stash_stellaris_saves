@@ -130,7 +130,7 @@ void Monitor::start() {
 
 	while(true)
 	{
-		sleep(1);
+		sleep(10);
 		std::cout << std::format("Monitor::start() - Polling... {} at {}:{}", poll_number++, __func__, __LINE__) << std::endl;
 	
 	}
@@ -176,7 +176,7 @@ void Monitor::backup_saves(fs::path empire) {
 
 void Monitor::index_callback(const fs::path& empire, const fs::path& save) {
 	
-	std::cout << "MONITOR's INDEX CALLBACK | TID: " << std::this_thread::get_id() << std::endl;
+	std::cout << std::this_thread::get_id() << ": Monitor Index's callback" << std::endl;
 	std::cout << std::format("Monitor::index_callback() - Empire: {} | Save: {} at {}:{}", empire.string(), save.string(), __func__, __LINE__) << std::endl;
 
 	auto empire_it = _empire_to_saves_list.find(empire);

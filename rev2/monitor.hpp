@@ -46,7 +46,7 @@ private:
 	void backup_saves(fs::path empire);
 
 private:
-	void index_callback(const fs::path& empires, const fs::path& save);
+	void index_callback(const fs::path& empire, const fs::path& save);
 
 private:
 	void log_state(fs::path empire) const;
