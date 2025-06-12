@@ -129,14 +129,17 @@ void Monitor::start() {
 	std::size_t poll_number = 0u;
 
 	while(true)
-	{
+	{	
 		sleep(10);
-		std::cout << std::format("Monitor::start() - Polling... {} at {}:{}", poll_number++, __func__, __LINE__) << std::endl;
+		std::cout << std::format("{}: Monitor::start() - Polling... {} at {}:{}", 
+			std::this_thread::get_id(), poll_number++, __func__, __LINE__) << std::endl;
 	
 	}
 }
 
 void Monitor::backup_saves(fs::path empire) {
+
+	// TODO: fix datarace
     auto& saves_queue = _empire_to_saves_list[empire];
     const size_t portion = std::min(_portion_size, saves_queue.size());
 
@@ -145,7 +148,7 @@ void Monitor::backup_saves(fs::path empire) {
 			const fs::path save_path = empire / saves_queue.front();
 
             // Set up backup paths
-            const fs::path backup_path = _backup / empire.filename() / save.filename();
+            const fs::path backup_path = _backup / empire.filename() / saves_queue.front().filename();
             fs::create_directories(backup_path.parent_path());
 
             // Copy file
