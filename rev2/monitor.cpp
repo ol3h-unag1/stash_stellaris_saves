@@ -92,6 +92,7 @@ void Monitor::init_impl() {
 		std::cout << std::format("Backup directory has been created: {} at {}:{}", _backup.string(), __func__, __LINE__) << std::endl;
 	}
 	
+	// TODO: make sure that empires are unique, otherwise we have DATA RACE on index_callback invokation
 	for (auto&& empire : Util::get_flat_subdirectories(_saves))
     {
 		auto& save_list = _empire_to_saves_list[empire];
