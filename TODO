@@ -10,9 +10,10 @@ DONE:
     {
        platform identity should have Util with get_some_paths methods
     }
+    - refactor monitor: directory and file creation should be delegeted to StashSaves::Path
 
 FIRST OF ORDER:
-   - refactor monitor: directory and file creation should be delegeted to StashSaves::Path
+   - try to use <syncstream> for output, if gcc supports it;
    - look thru other things too, write it down
    - we need to incapsulte inter-component communication and use socket as first version of implementation;
    - indexes should notify Monitor about files being created or deleted, monitor builds an array of files back up, let's say 10 files a portion, it copy the files and then removes them from original directory.
