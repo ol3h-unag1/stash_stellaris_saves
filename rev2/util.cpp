@@ -49,8 +49,8 @@ std::vector<fs::path> v1::get_files_in_directory(const fs::path& directory) {
     for (const auto& entry : fs::directory_iterator(directory)) 
     {
         if(entry.is_regular_file()) 
-    {
-            files.push_back(entry.path());
+        {
+            files.push_back(entry.path().filename());
         }
     }
     
