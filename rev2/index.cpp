@@ -208,8 +208,6 @@ namespace details
 
 	Index::~Index() {
 
-		std::cout << std::format("DUMMY V2", __func__, __LINE__) << std::endl;
-
 		if (_thread.joinable()) 
 		{
 			_thread.join();

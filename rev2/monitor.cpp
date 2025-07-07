@@ -132,8 +132,8 @@ void Monitor::start() {
 	while(true)
 	{	
 		sleep(10);
-		std::cout << std::format("{}: Monitor::start() - Polling... {} at {}:{}", 
-			std::this_thread::get_id(), poll_number++, __func__, __LINE__) << std::endl;
+		std::cout << std::this_thread::get_id() << ": " << std::format("Monitor::start() - Polling... {} at {}:{}", 
+			poll_number++, __func__, __LINE__) << std::endl;
 	
 	}
 }
@@ -160,7 +160,7 @@ void Monitor::backup_saves(fs::path empire) {
             // Remove original
             std::cout << std::format("Removing original: {}", save_path.string()) << std::endl;
             if (!fs::remove(save_path)) {
-                throw std::runtime_error(std::format("Failed to remove original file: {}", save.string()));
+                throw std::runtime_error(std::format("Failed to remove original file: {}", save_path.string()));
             }
 
             saves_queue.pop();
